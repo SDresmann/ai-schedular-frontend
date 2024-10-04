@@ -102,7 +102,7 @@ function App() {
     };
   
     try {
-      const response = await axios.post('http://localhost:5000/api/intro-to-ai-payment', formData);
+      const response = await axios.post('https://ai-schedular-backend.onrender.com/api/intro-to-ai-payment', formData);
       console.log('Contact added:', response.data);
     } catch (error) {
       console.error('Error submitting form:', error);
