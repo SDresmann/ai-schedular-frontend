@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import moment from 'moment'
+import ReCAPTCHA from "react-google-recaptcha"
+
 
 
 function App() {
@@ -14,6 +16,7 @@ function App() {
   const [postal, setPostal] = useState('')
   const [termsChecked, setTermsChecked] = useState(false)
   const [validDates, setValidDates] = useState([]);
+  const [captchaToken, setCaptchaToken] = useState('');
 
   function getNextValidProgramDates() {
     const today = moment();
@@ -85,7 +88,7 @@ function App() {
     // Format classDate to MM/DD/YYYY
     const formattedClassDate = new Date(classDate).toLocaleDateString('en-US');
   
-    if (!firstName || !lastName || !email || !phoneNumber || !program || !time || !classDate || !postal) {
+    if (!firstName || !lastName || !email || !phoneNumber || !program || !time || !classDate || !postal || !captchaToken) {
       alert('Please fill out all the fields.');
       return;
     }
@@ -99,6 +102,7 @@ function App() {
       time,
       classDate: formattedClassDate, // Use the formatted date
       postal,
+      captchaToken,
     };
   
     try {
@@ -109,9 +113,11 @@ function App() {
     }
   };
   
-  
+  const handleCaptchaChange = (token) => {
+    setCaptchaToken(token); // Capture the token when reCAPTCHA is completed
+  };
 
-
+  console.log("RECAPTCHA Site Key: ", process.env.REACT_APP_SITE_KEY);
   return (
     <div className="App">
       <div className='container'>
@@ -202,7 +208,10 @@ function App() {
       </label>
     </div>
   </div>
-
+  <ReCAPTCHA
+            sitekey={process.env.REACT_APP_SITE_KEY} // Your reCAPTCHA site key
+            onChange={handleCaptchaChange} // Capture the token
+          />
   <div className="col-12">
     <button type="submit" className="btn btn-primary">Submit</button>
   </div>
