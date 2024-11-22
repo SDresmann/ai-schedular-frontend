@@ -47,21 +47,6 @@ function App() {
     setValidDates(dates)
   }, [])
 
-  const handleFirstNameChange = (e) => {
-    setFirstName(e.target.value)
-  }
-
-  const handleLastNameChange = (e) => {
-    setLastName(e.target.value)
-  }
-
-  const handleEmailChange = (e) => {
-    setEmail(e.target.value);
-  };
-
-  const handlePhoneNumberChange = (e) => {
-    setPhoneNumber(e.target.value);
-  };
   const handleProgramChange = (e) => {
     setProgram(e.target.value);
   };
@@ -78,9 +63,6 @@ function App() {
     setPostal(e.target.value);
   };
 
-  const handleTermsCheckedChanged = (e) => {
-    setTermsChecked(e.target.checked)
-  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
