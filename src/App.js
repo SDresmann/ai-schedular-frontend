@@ -22,10 +22,10 @@ function App() {
     const today = moment();
     const validDates = [];
     let nextValidDate = today.add(2, 'days');
-  
+
     // Dates to exclude (like holidays or days off)
     const excludedDates = ['10/31/2024']; // Add more dates here in MM/DD/YYYY format
-  
+
     // Generate valid dates for the next 10 available days (Monday-Thursday)
     for (let i = 0; i < 10; i++) {
       // Skip to the next day if it falls on a Friday, Saturday, Sunday, or an excluded date
@@ -37,10 +37,10 @@ function App() {
       // Move to the next day
       nextValidDate = nextValidDate.add(1, 'day');
     }
-  
+
     return validDates;
   }
-  
+
 
   useEffect(() => {
     const dates = getNextValidProgramDates()
@@ -66,15 +66,15 @@ function App() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     // Format classDate to MM/DD/YYYY
     const formattedClassDate = new Date(classDate).toLocaleDateString('en-US');
-  
+
     if (!firstName || !lastName || !email || !phoneNumber || !program || !time || !classDate || !postal || !captchaToken) {
       alert('Please fill out all the fields.');
       return;
     }
-  
+
     const formData = {
       firstName,
       lastName,
@@ -86,7 +86,7 @@ function App() {
       postal,
       captchaToken,
     };
-  
+
     try {
       const response = await axios.post('https://ai-schedular-backend.onrender.com/api/intro-to-ai-payment', formData);
       console.log('Contact added:', response.data);
@@ -94,7 +94,7 @@ function App() {
       console.error('Error submitting form:', error);
     }
   };
-  
+
   const handleCaptchaChange = (token) => {
     setCaptchaToken(token); // Capture the token when reCAPTCHA is completed
   };
@@ -170,33 +170,33 @@ function App() {
           <div className="col-md-6">
             <label htmlFor="inputDate" className="form-label">Class Date</label>
             <select className="form-select form-select mb-3" aria-label="Large select example" id='inputDate' value={classDate} onChange={handleClassDateChange}>
-            <option value=''>Please select a date</option>
+              <option value=''>Please select a date</option>
               {validDates.map((date, index) => (
                 <option key={index} value={moment(date).format('MM/DD/YYYY')}>{moment(date).format('MM/DD/YYYY')}</option>
               ))}
             </select>
           </div>
           <div className="col-12">
-    <div className="form-check">
-      <input
-        className="form-check-input"
-        type="checkbox"
-        id="gridCheck"
-        checked={termsChecked}
-        onChange={(e) => setTermsChecked(e.target.checked)}
-      />
-      <label className="form-check-label" htmlFor="gridCheck">
-      By providing your contact information and checking the box, you agree that Kable Academy may contact you about our relevant content, products, and services via email, phone and SMS communications. SMS can be used for reminders. SMS can be used for updates. View our Privacy Policy.*
-      </label>
-    </div>
-  </div>
-  <ReCAPTCHA
+            <div className="form-check">
+              <input
+                className="form-check-input"
+                type="checkbox"
+                id="gridCheck"
+                checked={termsChecked}
+                onChange={(e) => setTermsChecked(e.target.checked)}
+              />
+              <label className="form-check-label" htmlFor="gridCheck">
+                By providing your contact information and checking the box, you agree that Kable Academy may contact you about our relevant content, products, and services via email, phone and SMS communications. SMS can be used for reminders. SMS can be used for updates. View our Privacy Policy.*
+              </label>
+            </div>
+          </div>
+          <ReCAPTCHA
             sitekey={process.env.REACT_APP_SITE_KEY} // Your reCAPTCHA site key
             onChange={handleCaptchaChange} // Capture the token
           />
-  <div className="col-12">
-    <button type="submit" className="btn btn-primary">Submit</button>
-  </div>
+          <div className="col-12">
+            <button type="submit" className="btn btn-primary">Submit</button>
+          </div>
         </form>
       </div>
     </div>
