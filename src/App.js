@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import moment from 'moment'
-import ReCAPTCHA from "react-google-recaptcha"
+import ReCAPTCHA from "react-google-recaptcha";
 
 
 
@@ -88,7 +88,7 @@ function App() {
     };
 
     try {
-      const response = await axios.post('https://ai-schedular-backend.onrender.com/api/intro-to-ai-payment', formData);
+      const response = await axios.post('https://app.kableacademy.com', formData);
       console.log('Contact added:', response.data);
     } catch (error) {
       console.error('Error submitting form:', error);
