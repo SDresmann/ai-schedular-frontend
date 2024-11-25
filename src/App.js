@@ -99,7 +99,7 @@ function App() {
     setCaptchaToken(token); // Capture the token when reCAPTCHA is completed
   };
 
-  console.log("RECAPTCHA Site Key: ", process.env.SITE_KEY);
+  console.log("RECAPTCHA Site Key: ", process.env.REACT_APP_SITE_KEY);
   return (
     <div className="App">
       <div className='container'>
