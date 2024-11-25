@@ -88,7 +88,7 @@ function App() {
     };
 
     try {
-      const response = await axios.post('https://app.kableacademy.com', formData);
+      const response = await axios.post('https://app.kableacademy.com/api/intro-to-ai-payment', formData);
       console.log('Contact added:', response.data);
     } catch (error) {
       console.error('Error submitting form:', error);
@@ -99,7 +99,7 @@ function App() {
     setCaptchaToken(token); // Capture the token when reCAPTCHA is completed
   };
 
-  console.log("RECAPTCHA Site Key: ", process.env.REACT_APP_SITE_KEY);
+  console.log("RECAPTCHA Site Key: ", process.env.SITE_KEY);
   return (
     <div className="App">
       <div className='container'>
@@ -191,7 +191,7 @@ function App() {
             </div>
           </div>
           <ReCAPTCHA
-            sitekey={process.env.REACT_APP_SITE_KEY} // Your reCAPTCHA site key
+            sitekey={process.env.SITE_KEY} // Your reCAPTCHA site key
             onChange={handleCaptchaChange} // Capture the token
           />
           <div className="col-12">
