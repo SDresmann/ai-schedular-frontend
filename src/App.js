@@ -191,7 +191,7 @@ function App() {
             </div>
           </div>
           <ReCAPTCHA
-            sitekey={process.env.SITE_KEY} // Your reCAPTCHA site key
+            sitekey={process.env.REACT_APP_SECRET_KEY} // Your reCAPTCHA site key
             onChange={handleCaptchaChange} // Capture the token
           />
           <div className="col-12">
