@@ -67,7 +67,7 @@ function App() {
   
     try {
       const response = await axios.post(
-        'https://ai-schedular-backend.onrender.com/api/intro-to-ai-payment',
+        '/api/intro-to-ai-payment',
         formData
       );
       console.log('Form submission response:', response.data);
