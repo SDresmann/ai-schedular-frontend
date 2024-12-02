@@ -79,6 +79,7 @@ function App() {
       alert('Error submitting the form. Please try again.');
     }
   };
+  console.log('Using reCAPTCHA Site Key:', process.env.REACT_APP_SITE_KEY);
 
   return (
     <GoogleReCaptchaProvider reCaptchaKey={process.env.REACT_APP_SITE_KEY}>
