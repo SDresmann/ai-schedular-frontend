@@ -4,215 +4,135 @@ import moment from 'moment';
 import { GoogleReCaptchaProvider, useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 function App() {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [program, setProgram] = useState('');
-  const [time, setTime] = useState('');
-  const [classDate, setClassDate] = useState('');
-  const [postal, setPostal] = useState('');
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phoneNumber: '',
+    program: '',
+    time: '',
+    classDate: '',
+    postal: '',
+  });
   const [termsChecked, setTermsChecked] = useState(false);
   const [validDates, setValidDates] = useState([]);
-  const { executeRecaptcha } = useGoogleReCaptcha(); // For executing reCAPTCHA
-
-  // Generate valid program dates
-  function getNextValidProgramDates() {
-    const today = moment();
-    const validDates = [];
-    let nextValidDate = today.add(2, 'days');
-
-    // Excluded dates (holidays or days off)
-    const excludedDates = ['10/31/2024']; // Add more dates in MM/DD/YYYY format
-
-    // Generate valid dates for the next 10 weekdays (Monday-Thursday)
-    for (let i = 0; i < 10; i++) {
-      while (nextValidDate.isoWeekday() > 4 || excludedDates.includes(nextValidDate.format('MM/DD/YYYY'))) {
-        nextValidDate = nextValidDate.add(1, 'day');
-      }
-      validDates.push(nextValidDate.format('MM/DD/YYYY'));
-      nextValidDate = nextValidDate.add(1, 'day');
-    }
-
-    return validDates;
-  }
+  const [formStatus, setFormStatus] = useState({ type: '', message: '' });
+  const { executeRecaptcha } = useGoogleReCaptcha();
 
   useEffect(() => {
-    const dates = getNextValidProgramDates();
-    setValidDates(dates);
+    const generateValidDates = () => {
+      const today = moment();
+      const validDates = [];
+      let nextDate = today.add(2, 'days');
+
+      const excludedDates = ['10/31/2024']; // Add excluded dates as needed
+
+      while (validDates.length < 10) {
+        if (nextDate.isoWeekday() <= 4 && !excludedDates.includes(nextDate.format('MM/DD/YYYY'))) {
+          validDates.push(nextDate.format('MM/DD/YYYY'));
+        }
+        nextDate = nextDate.add(1, 'days');
+      }
+      setValidDates(validDates);
+    };
+
+    generateValidDates();
   }, []);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!executeRecaptcha) {
-      console.error('reCAPTCHA has not been initialized');
+      setFormStatus({ type: 'error', message: 'reCAPTCHA not initialized' });
       return;
     }
 
     try {
-      const recaptchaToken = await executeRecaptcha('submit_form'); // Generate reCAPTCHA token
-      console.log('Generated reCAPTCHA Token:', recaptchaToken);
-
-      const formData = {
-        firstName,
-        lastName,
-        email,
-        phoneNumber,
-        program,
-        time,
-        classDate,
-        postal,
+      const recaptchaToken = await executeRecaptcha('submit_form');
+      const response = await axios.post('/api/intro-to-ai-payment', {
+        ...formData,
         recaptchaToken,
-      };
+      });
 
-      console.log('Form Data to Send:', formData);
-
-      const response = await axios.post(
-        '/api/intro-to-ai-payment', // Ensure this matches your backend endpoint
-        formData
-      );
+      setFormStatus({ type: 'success', message: 'Form submitted successfully!' });
       console.log('Form submission response:', response.data);
-      alert('Form submitted successfully!');
     } catch (error) {
       console.error('Error submitting form:', error.response?.data || error.message);
-      alert('Error submitting the form. Please try again.');
+      setFormStatus({ type: 'error', message: 'Failed to submit form. Please try again.' });
     }
   };
-  console.log('Using reCAPTCHA Site Key:', process.env.REACT_APP_SITE_KEY);
 
   return (
     <GoogleReCaptchaProvider reCaptchaKey={process.env.REACT_APP_SITE_KEY}>
       <div className="App">
-        <div className="container">
-          <form className="row g-3" onSubmit={handleSubmit}>
-            <div className="col-md-6">
-              <label htmlFor="inputName" className="form-label">First Name</label>
+        <form onSubmit={handleSubmit}>
+          {['firstName', 'lastName', 'email', 'phoneNumber', 'postal'].map((field) => (
+            <div key={field}>
+              <label>{field.replace(/^\w/, (c) => c.toUpperCase())}</label>
               <input
                 type="text"
-                className="form-control"
-                id="inputName"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
+                name={field}
+                value={formData[field]}
+                onChange={handleChange}
                 required
               />
             </div>
+          ))}
 
-            <div className="col-md-6">
-              <label htmlFor="inputLast" className="form-label">Last Name</label>
-              <input
-                type="text"
-                className="form-control"
-                id="inputLast"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                required
-              />
-            </div>
+          <div>
+            <label>Program</label>
+            <select name="program" value={formData.program} onChange={handleChange} required>
+              <option value="">Choose a Program</option>
+              <option value="Intro to AI">Intro to AI</option>
+            </select>
+          </div>
 
-            <div className="col-6">
-              <label htmlFor="inputEmail" className="form-label">Email</label>
-              <input
-                type="email"
-                className="form-control"
-                id="inputEmail"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
+          <div>
+            <label>Program Time</label>
+            <select name="time" value={formData.time} onChange={handleChange} required>
+              <option value="">Select a time</option>
+              <option value="2pm-5pm EST">2pm-5pm EST</option>
+              <option value="6pm-9pm EST">6pm-9pm EST</option>
+            </select>
+          </div>
 
-            <div className="col-6">
-              <label htmlFor="inputPhone" className="form-label">Phone Number</label>
-              <input
-                type="text"
-                className="form-control"
-                id="inputPhone"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                required
-              />
-            </div>
+          <div>
+            <label>Class Date</label>
+            <select name="classDate" value={formData.classDate} onChange={handleChange} required>
+              <option value="">Please select a date</option>
+              {validDates.map((date) => (
+                <option key={date} value={date}>
+                  {date}
+                </option>
+              ))}
+            </select>
+          </div>
 
-            <div className="col-12">
-              <label>Choose the program you are interested in</label>
-              <select
-                className="form-select"
-                value={program}
-                onChange={(e) => setProgram(e.target.value)}
-                required
-              >
-                <option value="">Choose a Program</option>
-                <option value="Intro to AI">Intro to AI</option>
-              </select>
-            </div>
+          <div>
+            <input
+              type="checkbox"
+              checked={termsChecked}
+              onChange={(e) => setTermsChecked(e.target.checked)}
+              required
+            />
+            <label>
+              Agree to Terms
+            </label>
+          </div>
 
-            <div className="col-md-12">
-              <label htmlFor="inputZip" className="form-label">Postal Code</label>
-              <input
-                type="text"
-                className="form-control"
-                id="inputZip"
-                value={postal}
-                onChange={(e) => setPostal(e.target.value)}
-                required
-              />
-            </div>
+          <button type="submit">Submit</button>
+        </form>
 
-            <div className="col-md-6">
-              <label htmlFor="inputTime" className="form-label">Program Time</label>
-              <select
-                className="form-select form-select mb-3"
-                id="inputTime"
-                value={time}
-                onChange={(e) => setTime(e.target.value)}
-                required
-              >
-                <option value="">Select a time</option>
-                <option value="2pm-5pm EST/1pm-4pm CST">2pm-5pm EST</option>
-                <option value="6pm-9pm EST/5pm-8pm CST">6pm-9pm EST</option>
-              </select>
-            </div>
-
-            <div className="col-md-6">
-              <label htmlFor="inputDate" className="form-label">Class Date</label>
-              <select
-                className="form-select form-select mb-3"
-                id="inputDate"
-                value={classDate}
-                onChange={(e) => setClassDate(e.target.value)}
-                required
-              >
-                <option value="">Please select a date</option>
-                {validDates.map((date, index) => (
-                  <option key={index} value={moment(date).format('MM/DD/YYYY')}>
-                    {moment(date).format('MM/DD/YYYY')}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="col-12">
-              <div className="form-check">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  id="gridCheck"
-                  checked={termsChecked}
-                  onChange={(e) => setTermsChecked(e.target.checked)}
-                  required
-                />
-                <label className="form-check-label" htmlFor="gridCheck">
-                  By providing your contact information and checking the box, you agree that Kable Academy may contact you about our relevant content, products, and services via email, phone and SMS communications. SMS can be used for reminders. SMS can be used for updates. View our Privacy Policy.*
-                </label>
-              </div>
-            </div>
-
-            <div className="col-12">
-              <button type="submit" className="btn btn-primary">Submit</button>
-            </div>
-          </form>
-        </div>
+        {formStatus.message && (
+          <p className={formStatus.type === 'success' ? 'success' : 'error'}>
+            {formStatus.message}
+          </p>
+        )}
       </div>
     </GoogleReCaptchaProvider>
   );
