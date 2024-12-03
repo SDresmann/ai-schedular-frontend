@@ -44,43 +44,52 @@ function App() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (!executeRecaptcha) {
-        console.error('reCAPTCHA has not been initialized');
-        return;
+      console.error('reCAPTCHA not initialized');
+      return;
     }
-
+  
+    let recaptchaToken;
+  
     try {
-        const recaptchaToken = await executeRecaptcha('submit_form');
-        console.log('Generated reCAPTCHA Token:', recaptchaToken);
-
-        const formData = {
-            firstName,
-            lastName,
-            email,
-            phoneNumber,
-            program,
-            time,
-            classDate,
-            postal,
-            recaptchaToken,
-        };
-
-        console.log('Form Data to Send:', formData);
-
-        const response = await axios.post(
-            '/api/intro-to-ai-payment',
-            formData,
-            { timeout: 20000 } // Extend timeout
-        );
-
-        console.log('Form submission response:', response.data);
-        alert('Form submitted successfully!');
+      // Add a timeout for reCAPTCHA execution
+      const recaptchaPromise = executeRecaptcha('submit_form');
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('reCAPTCHA timeout')), 50000) 
+      );
+  
+      recaptchaToken = await Promise.race([recaptchaPromise, timeoutPromise]);
     } catch (error) {
-        console.error('Error submitting form:', error.response?.data || error.message);
-        alert('Error submitting the form. Please try again.');
+      console.error('Error executing reCAPTCHA:', error.message);
+      alert('Failed to validate reCAPTCHA. Please try again.');
+      return;
     }
-};
+  
+    console.log('Generated reCAPTCHA Token:', recaptchaToken);
+  
+    const formData = {
+      firstName,
+      lastName,
+      email,
+      phoneNumber,
+      program,
+      time,
+      classDate,
+      postal,
+      recaptchaToken,
+    };
+  
+    try {
+      const response = await axios.post('/api/intro-to-ai-payment', formData);
+      console.log('Form submission response:', response.data);
+      alert('Form submitted successfully!');
+    } catch (error) {
+      console.error('Error submitting form:', error.response?.data || error.message);
+      alert('Error submitting the form. Please try again.');
+    }
+  };
+  
 
 
   return (
