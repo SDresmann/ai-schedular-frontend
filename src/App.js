@@ -81,7 +81,7 @@ function App() {
     };
   
     try {
-      const response = await axios.post('/api/intro-to-ai-payment', formData);
+      const response = await axios.post('/api/intro-to-ai-payment', formData, { timeout: 0 } );
       console.log('Form submission response:', response.data);
       alert('Form submitted successfully!');
     } catch (error) {
