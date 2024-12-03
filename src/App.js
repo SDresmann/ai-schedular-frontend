@@ -46,40 +46,42 @@ function App() {
     e.preventDefault();
 
     if (!executeRecaptcha) {
-      console.error('reCAPTCHA has not been initialized');
-      return;
+        console.error('reCAPTCHA has not been initialized');
+        return;
     }
 
     try {
-      const recaptchaToken = await executeRecaptcha('submit_form'); // Generate reCAPTCHA token
-      console.log('Generated reCAPTCHA Token:', recaptchaToken);
+        const recaptchaToken = await executeRecaptcha('submit_form');
+        console.log('Generated reCAPTCHA Token:', recaptchaToken);
 
-      const formData = {
-        firstName,
-        lastName,
-        email,
-        phoneNumber,
-        program,
-        time,
-        classDate,
-        postal,
-        recaptchaToken,
-      };
+        const formData = {
+            firstName,
+            lastName,
+            email,
+            phoneNumber,
+            program,
+            time,
+            classDate,
+            postal,
+            recaptchaToken,
+        };
 
-      console.log('Form Data to Send:', formData);
+        console.log('Form Data to Send:', formData);
 
-      const response = await axios.post(
-        '/api/intro-to-ai-payment', // Ensure this matches your backend endpoint
-        formData
-      );
-      console.log('Form submission response:', response.data);
-      alert('Form submitted successfully!');
+        const response = await axios.post(
+            'https://ai-schedular-backend.onrender.com/api/intro-to-ai-payment',
+            formData,
+            { timeout: 20000 } // Extend timeout
+        );
+
+        console.log('Form submission response:', response.data);
+        alert('Form submitted successfully!');
     } catch (error) {
-      console.error('Error submitting form:', error.response?.data || error.message);
-      alert('Error submitting the form. Please try again.');
+        console.error('Error submitting form:', error.response?.data || error.message);
+        alert('Error submitting the form. Please try again.');
     }
-  };
-  console.log('Using reCAPTCHA Site Key:', process.env.REACT_APP_SITE_KEY);
+};
+
 
   return (
     <GoogleReCaptchaProvider reCaptchaKey={process.env.REACT_APP_SITE_KEY}>
