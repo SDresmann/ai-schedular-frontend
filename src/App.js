@@ -56,7 +56,7 @@ function App() {
       // Add a timeout for reCAPTCHA execution
       const recaptchaPromise = executeRecaptcha('submit_form');
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('reCAPTCHA timeout')), 50000) 
+        setTimeout(() => reject(new Error('reCAPTCHA timeout')), 5000) 
       );
   
       recaptchaToken = await Promise.race([recaptchaPromise, timeoutPromise]);
