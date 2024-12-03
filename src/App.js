@@ -69,7 +69,7 @@ function App() {
         console.log('Form Data to Send:', formData);
 
         const response = await axios.post(
-            'https://ai-schedular-backend.onrender.com/api/intro-to-ai-payment',
+            '/api/intro-to-ai-payment',
             formData,
             { timeout: 20000 } // Extend timeout
         );
