@@ -14,7 +14,7 @@ function App() {
   const [postal, setPostal] = useState('');
   const [termsChecked, setTermsChecked] = useState(false);
   const [validDates, setValidDates] = useState([]);
-  const { executeRecaptcha } = useGoogleReCaptcha(); // For executing reCAPTCHA
+  const { executeRecaptcha } = useGoogleReCaptcha(); // Use reCAPTCHA hook
 
   // Generate valid program dates
   function getNextValidProgramDates() {
@@ -22,12 +22,8 @@ function App() {
     const validDates = [];
     let nextValidDate = today.add(2, 'days');
 
-    // Excluded dates (holidays or days off)
-    const excludedDates = ['10/31/2024']; // Add more dates in MM/DD/YYYY format
-
-    // Generate valid dates for the next 10 weekdays (Monday-Thursday)
-    for (let i = 0; i < 10; i++) {
-      while (nextValidDate.isoWeekday() > 4 || excludedDates.includes(nextValidDate.format('MM/DD/YYYY'))) {
+    for (let i = 0; i < 7; i++) {
+      while (nextValidDate.isoWeekday() > 4) {
         nextValidDate = nextValidDate.add(1, 'day');
       }
       validDates.push(nextValidDate.format('MM/DD/YYYY'));
@@ -44,53 +40,39 @@ function App() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (!executeRecaptcha) {
-      console.error('reCAPTCHA not initialized');
+      alert('reCAPTCHA is not initialized');
       return;
     }
-  
-    let recaptchaToken;
-  
+
     try {
-      // Add a timeout for reCAPTCHA execution
-      const recaptchaPromise = executeRecaptcha('submit_form');
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('reCAPTCHA timeout')), 5000) 
-      );
-  
-      recaptchaToken = await Promise.race([recaptchaPromise, timeoutPromise]);
-    } catch (error) {
-      console.error('Error executing reCAPTCHA:', error.message);
-      alert('Failed to validate reCAPTCHA. Please try again.');
-      return;
-    }
-  
-    console.log('Generated reCAPTCHA Token:', recaptchaToken);
-  
-    const formData = {
-      firstName,
-      lastName,
-      email,
-      phoneNumber,
-      program,
-      time,
-      classDate,
-      postal,
-      recaptchaToken,
-    };
-  
-    try {
-      const response = await axios.post('/api/intro-to-ai-payment', formData, { timeout: 0 } );
+      const recaptchaToken = await executeRecaptcha('submit_form'); // Generate reCAPTCHA token
+      console.log('Generated reCAPTCHA Token:', recaptchaToken);
+
+      const formData = {
+        firstName,
+        lastName,
+        email,
+        phoneNumber,
+        program, // Include program in form data
+        time,
+        classDate,
+        postal,
+        recaptchaToken, // Include the token in form data
+      };
+
+      console.log('Form Data Sent to Backend:', formData);
+
+      const response = await axios.post('https://ai-schedular-backend.onrender.com/api/intro-to-ai-payment', formData);
+
       console.log('Form submission response:', response.data);
       alert('Form submitted successfully!');
     } catch (error) {
-      console.error('Error submitting form:', error.response?.data || error.message);
-      alert('Error submitting the form. Please try again.');
+      console.error('Error during form submission:', error);
+      alert('Error submitting form. Please try again.');
     }
   };
-  
-
 
   return (
     <GoogleReCaptchaProvider reCaptchaKey={process.env.REACT_APP_SITE_KEY}>
@@ -214,7 +196,7 @@ function App() {
                   required
                 />
                 <label className="form-check-label" htmlFor="gridCheck">
-                  By providing your contact information and checking the box, you agree that Kable Academy may contact you about our relevant content, products, and services via email, phone and SMS communications. SMS can be used for reminders. SMS can be used for updates. View our Privacy Policy.*
+                  By providing your contact information, you agree to be contacted by us.
                 </label>
               </div>
             </div>
