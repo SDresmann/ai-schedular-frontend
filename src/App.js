@@ -66,6 +66,8 @@ function App() {
         time2,
         time3,
         classDate,
+        classDate2,
+        classDate3,
         postal,
         recaptchaToken, // Include the token in form data
       };
