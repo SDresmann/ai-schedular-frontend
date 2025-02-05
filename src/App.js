@@ -10,26 +10,32 @@ function App() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [program, setProgram] = useState('');
   const [time, setTime] = useState('');
+  const [time2, setTime2] = useState('');
+  const [time3, setTime3] = useState('');
   const [classDate, setClassDate] = useState('');
+  const [classDate2, setClassDate2] = useState('');
+  const [classDate3, setClassDate3] = useState('');
   const [postal, setPostal] = useState('');
   const [termsChecked, setTermsChecked] = useState(false);
   const [validDates, setValidDates] = useState([]);
   const { executeRecaptcha } = useGoogleReCaptcha(); // Use reCAPTCHA hook
 
   // Generate valid program dates
-  function getNextValidProgramDates() {
+  function getNextValidProgramDates(selectedDate) {
     const today = moment();
     const validDates = [];
-    let nextValidDate = today.add(2, 'days');
-
-    for (let i = 0; i < 7; i++) {
-      while (nextValidDate.isoWeekday() > 4) {
-        nextValidDate = nextValidDate.add(1, 'day');
+    let nextValidDate = today.add(2, 'days'); // Start from 2 days ahead
+  
+    while (validDates.length < 7) {
+      if (nextValidDate.isoWeekday() >= 1 && nextValidDate.isoWeekday() <= 4) {
+        const formattedDate = nextValidDate.clone().format('MM/DD/YYYY');
+        if (formattedDate !== selectedDate) {
+          validDates.push(formattedDate);
+        }
       }
-      validDates.push(nextValidDate.format('MM/DD/YYYY'));
-      nextValidDate = nextValidDate.add(1, 'day');
+      nextValidDate.add(1, 'day'); // Move to the next day
     }
-
+  
     return validDates;
   }
 
@@ -57,6 +63,8 @@ function App() {
         phoneNumber,
         program, // Include program in form data
         time,
+        time2,
+        time3,
         classDate,
         postal,
         recaptchaToken, // Include the token in form data
@@ -166,6 +174,34 @@ function App() {
                 <option value="6pm-9pm EST/5pm-8pm CST">6pm-9pm EST</option>
               </select>
             </div>
+            <div className="col-md-6">
+              <label htmlFor="inputTime" className="form-label">Program Time 2</label>
+              <select
+                className="form-select form-select mb-3"
+                id="inputTime"
+                value={time2}
+                onChange={(e) => setTime2(e.target.value)}
+                required
+              >
+                <option value="">Select a time</option>
+                <option value="2pm-5pm EST/1pm-4pm CST">2pm-5pm EST</option>
+                <option value="6pm-9pm EST/5pm-8pm CST">6pm-9pm EST</option>
+              </select>
+            </div>
+            <div className="col-md-6">
+              <label htmlFor="inputTime" className="form-label">Program Time 3</label>
+              <select
+                className="form-select form-select mb-3"
+                id="inputTime"
+                value={time3}
+                onChange={(e) => setTime3(e.target.value)}
+                required
+              >
+                <option value="">Select a time</option>
+                <option value="2pm-5pm EST/1pm-4pm CST">2pm-5pm EST</option>
+                <option value="6pm-9pm EST/5pm-8pm CST">6pm-9pm EST</option>
+              </select>
+            </div>
 
             <div className="col-md-6">
               <label htmlFor="inputDate" className="form-label">Class Date</label>
@@ -184,7 +220,40 @@ function App() {
                 ))}
               </select>
             </div>
-
+            <div className="col-md-6">
+              <label htmlFor="inputDate" className="form-label">Class Date</label>
+              <select
+                className="form-select form-select mb-3"
+                id="inputDate"
+                value={classDate2}
+                onChange={(e) => setClassDate2(e.target.value)}
+                required
+              >
+                <option value="">Please select a date</option>
+                {validDates.map((date, index) => (
+                  <option key={index} value={moment(date).format('MM/DD/YYYY')}>
+                    {moment(date).format('MM/DD/YYYY')}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="col-md-6">
+              <label htmlFor="inputDate" className="form-label">Class Date</label>
+              <select
+                className="form-select form-select mb-3"
+                id="inputDate"
+                value={classDate3}
+                onChange={(e) => setClassDate3(e.target.value)}
+                required
+              >
+                <option value="">Please select a date</option>
+                {validDates.map((date, index) => (
+                  <option key={index} value={moment(date).format('MM/DD/YYYY')}>
+                    {moment(date).format('MM/DD/YYYY')}
+                  </option>
+                ))}
+              </select>
+            </div>
             <div className="col-12">
               <div className="form-check">
                 <input
@@ -200,7 +269,6 @@ function App() {
                 </label>
               </div>
             </div>
-
             <div className="col-12">
               <button type="submit" className="btn btn-primary">Submit</button>
             </div>
