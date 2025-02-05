@@ -46,43 +46,49 @@ function App() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (!executeRecaptcha) {
-      alert('reCAPTCHA is not initialized');
+      alert("reCAPTCHA is not initialized");
       return;
     }
-
+  
     try {
-      const recaptchaToken = await executeRecaptcha('submit_form'); // Generate reCAPTCHA token
-      console.log('Generated reCAPTCHA Token:', recaptchaToken);
-
+      const recaptchaToken = await executeRecaptcha("submit_form");
+      console.log("Generated reCAPTCHA Token:", recaptchaToken);
+  
+      // Ensure required fields are always present
       const formData = {
         firstName,
         lastName,
         email,
         phoneNumber,
-        program, // Include program in form data
-        time,
-        time2,
-        time3,
-        classDate,
-        classDate2: classDate2 || null, // Ensure valid data
-        classDate3: classDate3 || null,
+        program,
+        time: time || "2pm-5pm EST/1pm-4pm CST", // Default if empty
+        time2: time2 || "6pm-9pm EST/5pm-8pm CST",
+        time3: time3 || "2pm-5pm EST/1pm-4pm CST",
+        classDate: classDate || moment().add(2, "days").format("MM/DD/YYYY"), // Default to the next available date
+        classDate2: classDate2 || classDate, // If empty, use classDate
+        classDate3: classDate3 || classDate, // If empty, use classDate
         postal,
-        recaptchaToken, // Include the token in form data
+        recaptchaToken,
       };
-
-      console.log('Form Data Sent to Backend:', formData);
-
-      const response = await axios.post('https://ai-schedular-backend.onrender.com/api/intro-to-ai-payment', formData);
-
-      console.log('Form submission response:', response.data);
-      alert('Form submitted successfully!');
+  
+      console.log("Form Data Sent to Backend:", formData);
+  
+      const response = await axios.post(
+        "https://ai-schedular-backend.onrender.com/api/intro-to-ai-payment",
+        formData,
+        { headers: { "Content-Type": "application/json" } }
+      );
+  
+      console.log("Form submission response:", response.data);
+      alert("Form submitted successfully!");
     } catch (error) {
-      console.error('Error during form submission:', error);
-      alert('Error submitting form. Please try again.');
+      console.error("Error during form submission:", error);
+      alert("Error submitting form. Please try again.");
     }
   };
+  
 
   return (
     <GoogleReCaptchaProvider reCaptchaKey={process.env.REACT_APP_SITE_KEY}>
