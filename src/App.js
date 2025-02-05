@@ -66,8 +66,8 @@ function App() {
         time2,
         time3,
         classDate,
-        classDate2,
-        classDate3,
+        classDate2: classDate2 || null, // Ensure valid data
+        classDate3: classDate3 || null,
         postal,
         recaptchaToken, // Include the token in form data
       };
