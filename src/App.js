@@ -198,8 +198,8 @@ const handleSubmit = async (e) => {
                 required
               >
                 <option value="">Select a time</option>
-                <option value="2pm-5pm EST/1pm-4pm CST">2pm-5pm EST</option>
-                <option value="6pm-9pm EST/5pm-8pm CST">6pm-9pm EST</option>
+                <option value="2:00PM - 500PM">2:00PM - 5:00PM EST</option>
+                <option value="6:00PM - 9PM">6:00PM - 9:00PM EST</option>
               </select>
             </div>
             <div className="col-md-6">
@@ -212,8 +212,8 @@ const handleSubmit = async (e) => {
                 required
               >
                 <option value="">Select a time</option>
-                <option value="2pm-5pm EST/1pm-4pm CST">2pm-5pm EST</option>
-                <option value="6pm-9pm EST/5pm-8pm CST">6pm-9pm EST</option>
+                <option value="2:00PM - 500PM">2:00PM - 5:00PM EST</option>
+                <option value="6:00PM - 9PM">6:00PM - 9:00PM EST</option>
               </select>
             </div>
             <div className="col-md-6">
@@ -226,8 +226,8 @@ const handleSubmit = async (e) => {
                 required
               >
                 <option value="">Select a time</option>
-                <option value="2pm-5pm EST/1pm-4pm CST">2pm-5pm EST</option>
-                <option value="6pm-9pm EST/5pm-8pm CST">6pm-9pm EST</option>
+                <option value="2:00PM - 500PM">2:00PM - 5:00PM EST</option>
+                <option value="6:00PM - 9PM">6:00PM - 9:00PM EST</option>
               </select>
             </div>
 
