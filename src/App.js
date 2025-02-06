@@ -44,48 +44,74 @@ function App() {
     setValidDates(dates);
   }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
 
-    if (!executeRecaptcha) {
-      alert('reCAPTCHA is not initialized');
-      return;
-    }
+  
+useEffect(() => {
+  if (!executeRecaptcha) {
+    console.warn("⚠️ reCAPTCHA is NOT ready. Retrying in 1 second...");
+    
+    const interval = setInterval(() => {
+      if (executeRecaptcha) {
+        console.log("✅ reCAPTCHA is now ready.");
+        clearInterval(interval);
+      }
+    }, 1000); // Check every second
 
-    try {
-      const recaptchaToken = await executeRecaptcha('submit_form'); // Generate reCAPTCHA token
-      console.log('Generated reCAPTCHA Token:', recaptchaToken);
+    return () => clearInterval(interval);
+  } else {
+    console.log("✅ reCAPTCHA is ready.");
+  }
+}, [executeRecaptcha]);
 
-      const formData = {
-        firstName,
-        lastName,
-        email,
-        phoneNumber,
-        program,
-        time: time || "2pm-5pm EST/1pm-4pm CST", // Default if empty
-        time2: time2 || "6pm-9pm EST/5pm-8pm CST",
-        time3: time3 || "2pm-5pm EST/1pm-4pm CST",
-        classDate: classDate || moment().add(2, "days").format("MM/DD/YYYY"), // Default to the next available date
-        classDate2: classDate2 || classDate, // If empty, use classDate
-        classDate3: classDate3 || classDate, // If empty, use classDate
-        postal,
-        recaptchaToken,
-      };
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-      console.log('Form Data Sent to Backend:', formData);
+  if (!executeRecaptcha) {
+    alert("❌ reCAPTCHA is not initialized!");
+    return;
+  }
 
-      const response = await axios.post('https://ai-schedular-backend.onrender.com/api/intro-to-ai-payment', formData);
+  try {
+    console.log("⚡ Generating reCAPTCHA Token...");
+    const recaptchaToken = await executeRecaptcha("submit_form");
 
-      console.log('Form submission response:', response.data);
-      alert('Form submitted successfully!');
-    } catch (error) {
-      console.error('Error during form submission:', error);
-      alert('Error submitting form. Please try again.');
-    }
-  };
+    console.log("✅ Generated reCAPTCHA Token:", recaptchaToken);
+
+    const formData = {
+      firstname: firstName,
+      lastname: lastName,
+      email,
+      phone: phoneNumber,
+      program_session: time,
+      program_time_2: time2,
+      program_time_3: time3,
+      intro_to_ai_program_date: classDate,  // Backend converts the date
+      intro_to_ai_date_2: classDate2,
+      intro_to_ai_date_3: classDate3,
+      zip: postal,
+      recaptchaToken,
+    };
+
+    console.log("🚀 Sending Final Form Data:", formData);
+
+    const response = await axios.post(
+      "https://ai-schedular-backend.onrender.com/api/intro-to-ai-payment",
+      formData,
+      { headers: { "Content-Type": "application/json" } }
+    );
+
+    console.log("✅ Form submission response:", response.data);
+    alert("Form submitted successfully!");
+  } catch (error) {
+    console.error("❌ Error during form submission:", error);
+    alert("Error submitting form. Please try again.");
+  }
+};
+
+
 
   return (
-    <GoogleReCaptchaProvider reCaptchaKey={process.env.REACT_APP_SITE_KEY}>
+    <GoogleReCaptchaProvider reCaptchaKey='6LcRLocqAAAAAJS6nXWzXbYLuYjLbqgLdHInE-4N'>
       <div className="App">
         <div className="container">
           <form className="row g-3" onSubmit={handleSubmit}>

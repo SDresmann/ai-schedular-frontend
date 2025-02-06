@@ -10,11 +10,12 @@ root.render(
     <GoogleReCaptchaProvider
       reCaptchaKey={process.env.REACT_APP_SITE_KEY}
       scriptProps={{
-        async: true, // Asynchronously load the reCAPTCHA script
-        defer: true, // Defer loading the script until DOM is ready
+        async: true,
+        defer: true,
+        onLoad: () => console.log("✅ reCAPTCHA script loaded successfully!"),
       }}
       onScriptLoadError={(error) => {
-        console.error("reCAPTCHA script failed to load:", error);
+        console.error("❌ reCAPTCHA script failed to load:", error);
         alert("Error loading reCAPTCHA. Please try refreshing the page.");
       }}
     >
