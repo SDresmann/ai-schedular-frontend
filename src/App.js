@@ -77,9 +77,9 @@ function App() {
 
       console.log("✅ Generated reCAPTCHA Token:", recaptchaToken);
 
-      function convertDateToTimestamp(date) {
+      function convertDateToYYYYMMDD(date) {
         if (!date) return null;
-        return new Date(date).getTime(); // Converts to UNIX timestamp (milliseconds)
+        return moment(date, "MM/DD/YYYY").format("YYYY/MM/DD"); // ✅ CORRECT FORMAT FOR HUBSPOT
       }
       
       // Ensure dates are converted before sending:
@@ -92,9 +92,9 @@ function App() {
         time,
         time2,
         time3,
-        classDate: convertDateToTimestamp(classDate),
-        classDate2: convertDateToTimestamp(classDate2),
-        classDate3: convertDateToTimestamp(classDate3),
+        classDate: convertDateToYYYYMMDD(classDate), // ✅ FIXED
+        classDate2: convertDateToYYYYMMDD(classDate2), // ✅ FIXED
+        classDate3: convertDateToYYYYMMDD(classDate3), // ✅ FIXED
         postal,
         recaptchaToken,
       };
