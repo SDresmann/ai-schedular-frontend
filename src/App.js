@@ -25,7 +25,7 @@ function App() {
     const today = moment();
     const validDates = [];
     let nextValidDate = today.add(2, 'days'); // Start from 2 days ahead
-  
+
     while (validDates.length < 7) {
       if (nextValidDate.isoWeekday() >= 1 && nextValidDate.isoWeekday() <= 4) {
         const formattedDate = nextValidDate.clone().format('MM/DD/YYYY');
@@ -35,7 +35,7 @@ function App() {
       }
       nextValidDate.add(1, 'day'); // Move to the next day
     }
-  
+
     return validDates;
   }
 
@@ -45,68 +45,68 @@ function App() {
   }, []);
 
 
-  
-useEffect(() => {
-  if (!executeRecaptcha) {
-    console.warn("⚠️ reCAPTCHA is NOT ready. Retrying in 1 second...");
-    
-    const interval = setInterval(() => {
-      if (executeRecaptcha) {
-        console.log("✅ reCAPTCHA is now ready.");
-        clearInterval(interval);
-      }
-    }, 1000); // Check every second
 
-    return () => clearInterval(interval);
-  } else {
-    console.log("✅ reCAPTCHA is ready.");
-  }
-}, [executeRecaptcha]);
+  useEffect(() => {
+    if (!executeRecaptcha) {
+      console.warn("⚠️ reCAPTCHA is NOT ready. Retrying in 1 second...");
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+      const interval = setInterval(() => {
+        if (executeRecaptcha) {
+          console.log("✅ reCAPTCHA is now ready.");
+          clearInterval(interval);
+        }
+      }, 1000); // Check every second
 
-  if (!executeRecaptcha) {
-    alert("❌ reCAPTCHA is not initialized!");
-    return;
-  }
+      return () => clearInterval(interval);
+    } else {
+      console.log("✅ reCAPTCHA is ready.");
+    }
+  }, [executeRecaptcha]);
 
-  try {
-    console.log("⚡ Generating reCAPTCHA Token...");
-    const recaptchaToken = await executeRecaptcha("submit_form");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    console.log("✅ Generated reCAPTCHA Token:", recaptchaToken);
+    if (!executeRecaptcha) {
+      alert("❌ reCAPTCHA is not initialized!");
+      return;
+    }
 
-    const formData = {
-      firstname: firstName,
-      lastname: lastName,
-      email,
-      phone: phoneNumber,
-      program_session: time,
-      program_time_2: time2,
-      program_time_3: time3,
-      intro_to_ai_program_date: classDate,  // Backend converts the date
-      intro_to_ai_date_2: classDate2,
-      intro_to_ai_date_3: classDate3,
-      zip: postal,
-      recaptchaToken,
-    };
+    try {
+      console.log("⚡ Generating reCAPTCHA Token...");
+      const recaptchaToken = await executeRecaptcha("submit_form");
 
-    console.log("🚀 Sending Final Form Data:", formData);
+      console.log("✅ Generated reCAPTCHA Token:", recaptchaToken);
 
-    const response = await axios.post(
-      "https://ai-schedular-backend.onrender.com/api/intro-to-ai-payment",
-      formData,
-      { headers: { "Content-Type": "application/json" } }
-    );
+      const formData = {
+        firstname: firstName,
+        lastname: lastName,
+        email,
+        phone: phoneNumber,
+        program_session: time,
+        program_time_2: time2,
+        program_time_3: time3,
+        intro_to_ai_program_date: classDate,  // Backend converts the date
+        intro_to_ai_date_2: classDate2,
+        intro_to_ai_date_3: classDate3,
+        zip: postal,
+        recaptchaToken,
+      };
 
-    console.log("✅ Form submission response:", response.data);
-    alert("Form submitted successfully!");
-  } catch (error) {
-    console.error("❌ Error during form submission:", error);
-    alert("Error submitting form. Please try again.");
-  }
-};
+      console.log("🚀 Sending Final Form Data:", formData);
+
+      const response = await axios.post(
+        "https://ai-schedular-backend.onrender.com/api/intro-to-ai-payment",
+        formData,
+        { headers: { "Content-Type": "application/json" } }
+      );
+
+      console.log("✅ Form submission response:", response.data);
+      alert("Form submitted successfully!");
+    } catch (error) {
+      console.error("❌ Error during form submission:", error);
+      alert("Error submitting form. Please try again.");
+    }
+  };
 
 
 
@@ -190,44 +190,29 @@ const handleSubmit = async (e) => {
 
             <div className="col-md-6">
               <label htmlFor="inputTime" className="form-label">Program Time</label>
-              <select
-                className="form-select form-select mb-3"
-                id="inputTime"
-                value={time}
-                onChange={(e) => setTime(e.target.value)}
-                required
-              >
-                <option value="">Select a time</option>
-                <option value="2:00PM - 500PM">2:00PM - 5:00PM EST</option>
-                <option value="6:00PM - 9PM">6:00PM - 9:00PM EST</option>
+              <select value={time} onChange={(e) => setTime(e.target.value)} required>
+                <option value="10am-1pm EST/9am-12pm CST">10am-1pm EST</option>
+                <option value="2pm-5pm EST/1pm-4pm CST">2:00PM - 500PM</option>
+                <option value="6pm-9pm EST/5pm-8pm CST">6:00PM - 9PM</option>
+                <option value="4pm-7pm EST">4pm-7pm EST</option>
               </select>
             </div>
             <div className="col-md-6">
               <label htmlFor="inputTime" className="form-label">Program Time 2</label>
-              <select
-                className="form-select form-select mb-3"
-                id="inputTime"
-                value={time2}
-                onChange={(e) => setTime2(e.target.value)}
-                required
-              >
-                <option value="">Select a time</option>
-                <option value="2:00PM - 500PM">2:00PM - 5:00PM EST</option>
-                <option value="6:00PM - 9PM">6:00PM - 9:00PM EST</option>
+              <select value={time} onChange={(e) => setTime2(e.target.value)} required>
+                <option value="10am-1pm EST/9am-12pm CST">10am-1pm EST</option>
+                <option value="2pm-5pm EST/1pm-4pm CST">2:00PM - 500PM</option>
+                <option value="6pm-9pm EST/5pm-8pm CST">6:00PM - 9PM</option>
+                <option value="4pm-7pm EST">4pm-7pm EST</option>
               </select>
             </div>
             <div className="col-md-6">
               <label htmlFor="inputTime" className="form-label">Program Time 3</label>
-              <select
-                className="form-select form-select mb-3"
-                id="inputTime"
-                value={time3}
-                onChange={(e) => setTime3(e.target.value)}
-                required
-              >
-                <option value="">Select a time</option>
-                <option value="2:00PM - 500PM">2:00PM - 5:00PM EST</option>
-                <option value="6:00PM - 9PM">6:00PM - 9:00PM EST</option>
+              <select value={time} onChange={(e) => setTime3(e.target.value)} required>
+                <option value="10am-1pm EST/9am-12pm CST">10am-1pm EST</option>
+                <option value="2pm-5pm EST/1pm-4pm CST">2:00PM - 500PM</option>
+                <option value="6pm-9pm EST/5pm-8pm CST">6:00PM - 9PM</option>
+                <option value="4pm-7pm EST">4pm-7pm EST</option>
               </select>
             </div>
 
