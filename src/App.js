@@ -191,27 +191,27 @@ function App() {
             <div className="col-md-6">
               <label htmlFor="inputTime" className="form-label">Program Time</label>
               <select className="form-select form-select mb-3" value={time} onChange={(e) => setTime(e.target.value)} required>
-                <option value="10am-1pm EST/9am-12pm CST">10am-1pm EST</option>
-                <option value="2pm-5pm EST/1pm-4pm CST">2:00PM - 500PM</option>
-                <option value="6pm-9pm EST/5pm-8pm CST">6:00PM - 9PM</option>
+                <option value="10am-1pm EST/9am-12pm CST">10am-1pm EST/9am-12pm CST</option>
+                <option value="2pm-5pm EST/1pm-4pm CST">2pm-5pm EST/1pm-4pm CST</option>
+                <option value="6pm-9pm EST/5pm-8pm CST">6pm-9pm EST/5pm-8pm CST</option>
                 <option value="4pm-7pm EST">4pm-7pm EST</option>
               </select>
             </div>
             <div className="col-md-6">
               <label htmlFor="inputTime2" className="form-label">Program Time 2</label>
               <select className="form-select form-select mb-3" value={time2} onChange={(e) => setTime2(e.target.value)} required>
-                <option value="10am-1pm EST/9am-12pm CST">10am-1pm EST</option>
-                <option value="2pm-5pm EST/1pm-4pm CST">2:00PM - 500PM</option>
-                <option value="6pm-9pm EST/5pm-8pm CST">6:00PM - 9PM</option>
+                <option value="10am-1pm EST/9am-12pm CST">10am-1pm EST/9am-12pm CST</option>
+                <option value="2pm-5pm EST/1pm-4pm CST">2pm-5pm EST/1pm-4pm CST</option>
+                <option value="6pm-9pm EST/5pm-8pm CST">6pm-9pm EST/5pm-8pm CST</option>
                 <option value="4pm-7pm EST">4pm-7pm EST</option>
               </select>
             </div>
             <div className="col-md-6">
               <label htmlFor="inputTime3" className="form-label">Program Time 3</label>
               <select className="form-select form-select mb-3" value={time3} onChange={(e) => setTime3(e.target.value)} required>
-                <option value="10am-1pm EST/9am-12pm CST">10am-1pm EST</option>
-                <option value="2pm-5pm EST/1pm-4pm CST">2:00PM - 500PM</option>
-                <option value="6pm-9pm EST/5pm-8pm CST">6:00PM - 9PM</option>
+                <option value="10am-1pm EST/9am-12pm CST">10am-1pm EST/9am-12pm CST</option>
+                <option value="2pm-5pm EST/1pm-4pm CST">2pm-5pm EST/1pm-4pm CST</option>
+                <option value="6pm-9pm EST/5pm-8pm CST">6pm-9pm EST/5pm-8pm CST</option>
                 <option value="4pm-7pm EST">4pm-7pm EST</option>
               </select>
             </div>
@@ -228,7 +228,7 @@ function App() {
                 <option value="">Please select a date</option>
                 {validDates.map((date, index) => (
                   <option key={index} value={moment(date).format('MM/DD/YYYY')}>
-                    {moment(date).format('MM/DD/YYYY')}
+                    {moment(date).format('YYYY/MM/DD')}
                   </option>
                 ))}
               </select>
@@ -244,8 +244,8 @@ function App() {
               >
                 <option value="">Please select a date</option>
                 {validDates.map((date, index) => (
-                  <option key={index} value={moment(date).format('MM/DD/YYYY')}>
-                    {moment(date).format('MM/DD/YYYY')}
+                  <option key={index} value={moment(date).format('YYYY/MM/DD')}>
+                    {moment(date).format('YYYY/MM/DD')}
                   </option>
                 ))}
               </select>
@@ -261,8 +261,8 @@ function App() {
               >
                 <option value="">Please select a date</option>
                 {validDates.map((date, index) => (
-                  <option key={index} value={moment(date).format('MM/DD/YYYY')}>
-                    {moment(date).format('MM/DD/YYYY')}
+                  <option key={index} value={moment(date).format('YYYY/MM/DD')}>
+                    {moment(date).format('YYYY/MM/DD')}
                   </option>
                 ))}
               </select>
