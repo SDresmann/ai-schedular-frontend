@@ -190,7 +190,7 @@ function App() {
 
             <div className="col-md-6">
               <label htmlFor="inputTime" className="form-label">Program Time</label>
-              <select value={time} onChange={(e) => setTime(e.target.value)} required>
+              <select className="form-select form-select mb-3" value={time} onChange={(e) => setTime(e.target.value)} required>
                 <option value="10am-1pm EST/9am-12pm CST">10am-1pm EST</option>
                 <option value="2pm-5pm EST/1pm-4pm CST">2:00PM - 500PM</option>
                 <option value="6pm-9pm EST/5pm-8pm CST">6:00PM - 9PM</option>
@@ -198,8 +198,8 @@ function App() {
               </select>
             </div>
             <div className="col-md-6">
-              <label htmlFor="inputTime" className="form-label">Program Time 2</label>
-              <select value={time2} onChange={(e) => setTime2(e.target.value)} required>
+              <label htmlFor="inputTime2" className="form-label">Program Time 2</label>
+              <select className="form-select form-select mb-3" value={time2} onChange={(e) => setTime2(e.target.value)} required>
                 <option value="10am-1pm EST/9am-12pm CST">10am-1pm EST</option>
                 <option value="2pm-5pm EST/1pm-4pm CST">2:00PM - 500PM</option>
                 <option value="6pm-9pm EST/5pm-8pm CST">6:00PM - 9PM</option>
@@ -207,8 +207,8 @@ function App() {
               </select>
             </div>
             <div className="col-md-6">
-              <label htmlFor="inputTime" className="form-label">Program Time 3</label>
-              <select value={time3} onChange={(e) => setTime3(e.target.value)} required>
+              <label htmlFor="inputTime3" className="form-label">Program Time 3</label>
+              <select className="form-select form-select mb-3" value={time3} onChange={(e) => setTime3(e.target.value)} required>
                 <option value="10am-1pm EST/9am-12pm CST">10am-1pm EST</option>
                 <option value="2pm-5pm EST/1pm-4pm CST">2:00PM - 500PM</option>
                 <option value="6pm-9pm EST/5pm-8pm CST">6:00PM - 9PM</option>
