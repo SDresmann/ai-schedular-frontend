@@ -77,9 +77,9 @@ function App() {
 
       console.log("✅ Generated reCAPTCHA Token:", recaptchaToken);
 
-      function convertDateToISO8601(date) {
+      function convertDateToTimestamp(date) {
         if (!date) return null;
-        return new Date(date).toISOString(); // Converts to YYYY-MM-DDTHH:mm:ss.sTZD
+        return new Date(date).getTime(); // Converts to UNIX timestamp (milliseconds)
       }
       
       // Ensure dates are converted before sending:
@@ -92,12 +92,14 @@ function App() {
         time,
         time2,
         time3,
-        classDate: convertDateToISO8601(classDate),
-        classDate2: convertDateToISO8601(classDate2),
-        classDate3: convertDateToISO8601(classDate3),
+        classDate: convertDateToTimestamp(classDate),
+        classDate2: convertDateToTimestamp(classDate2),
+        classDate3: convertDateToTimestamp(classDate3),
         postal,
         recaptchaToken,
       };
+      
+      console.log("🚀 Sending Form Data:", formData);
       
 
       console.log("🚀 Sending Final Form Data:", formData);
