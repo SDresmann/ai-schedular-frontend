@@ -77,20 +77,28 @@ function App() {
 
       console.log("✅ Generated reCAPTCHA Token:", recaptchaToken);
 
+      function convertDateToISO8601(date) {
+        if (!date) return null;
+        return new Date(date).toISOString(); // Converts to YYYY-MM-DDTHH:mm:ss.sTZD
+      }
+      
+      // Ensure dates are converted before sending:
       const formData = {
-        firstname: firstName,
-        lastname: lastName,
+        firstName,
+        lastName,
         email,
-        phone: phoneNumber,
-        program_session: time,
-        program_time_2: time2,
-        program_time_3: time3,
-        intro_to_ai_program_date: classDate,  // Backend converts the date
-        intro_to_ai_date_2: classDate2,
-        intro_to_ai_date_3: classDate3,
-        zip: postal,
+        phoneNumber,
+        program,
+        time,
+        time2,
+        time3,
+        classDate: convertDateToISO8601(classDate),
+        classDate2: convertDateToISO8601(classDate2),
+        classDate3: convertDateToISO8601(classDate3),
+        postal,
         recaptchaToken,
       };
+      
 
       console.log("🚀 Sending Final Form Data:", formData);
 
