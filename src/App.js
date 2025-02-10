@@ -81,7 +81,15 @@ function App() {
         if (!date) return null;
         return moment(date, "YYYY/MM/DD").toISOString(); // ✅ Convert to ISO8601
       }
-      
+      const fixProgramTime = (time) => {
+        const validTimes = {
+          "10am-1pm EST/9am-12pm CST": "10am-1pm EST",
+          "2pm-5pm EST/1pm-4pm CST": "2:00PM - 500PM",
+          "6pm-9pm EST/5pm-8pm CST": "6:00PM - 9PM",
+          "4pm-7pm EST": "4pm-7pm EST",
+        };
+        return validTimes[time] || null; // Return null if time is not valid
+      };
       
       // Ensure dates are converted before sending:
       const formData = {
@@ -89,9 +97,9 @@ function App() {
         lastname: lastName,
         email,
         phone: phoneNumber, // ✅ Renamed
-        program_session: time, // ✅ Corrected field name
-        program_time_2: time2, // ✅ Corrected field name
-        program_time_3: time3, // ✅ Corrected field name
+        program_session: fixProgramTime(time), // Ensure this is in the expected format
+        program_time_2: fixProgramTime(time2), // Ensure this is in the expected format
+        program_time_3: fixProgramTime(time3), // Ensure this is in the expected format
         intro_to_ai_program_date: convertDateToMidnightISO(classDate), // ✅ Fixed date
         intro_to_ai_date_2: convertDateToMidnightISO(classDate2), // ✅ Fixed date
         intro_to_ai_date_3: convertDateToMidnightISO(classDate3), // ✅ Fixed date
