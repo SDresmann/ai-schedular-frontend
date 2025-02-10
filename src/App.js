@@ -85,7 +85,7 @@ function App() {
           "6pm-9pm EST/5pm-8pm CST": "6pm-9pm EST/5pm-8pm CST",
           "4pm-7pm EST": "4pm-7pm EST",
         };
-        return validTimes[time] || time; // Fallback to the original value
+        return validTimes[time] || null; // Fallback to the original value
       };
 
       // Ensure dates are converted before sending:
@@ -103,7 +103,7 @@ function App() {
         zip: postal, // ✅ Renamed
         recaptchaToken,
       };
-
+      console.log("🚀 Sending Form Data:", formData);
       function convertDateToMidnightISO(date) {
         if (!date) {
           console.warn("⚠️ No date provided for conversion.");
