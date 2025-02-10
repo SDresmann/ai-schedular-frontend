@@ -77,10 +77,11 @@ function App() {
 
       console.log("✅ Generated reCAPTCHA Token:", recaptchaToken);
 
-      function convertDateToYYYYMMDD(date) {
+      function convertDateToISO8601(date) {
         if (!date) return null;
-        return moment(date, "MM/DD/YYYY").format("YYYY/MM/DD"); // ✅ CORRECT FORMAT FOR HUBSPOT
+        return moment(date, "YYYY/MM/DD").toISOString(); // ✅ Convert to ISO8601
       }
+      
       
       // Ensure dates are converted before sending:
       const formData = {
@@ -88,12 +89,12 @@ function App() {
         lastname: lastName,
         email,
         phone: phoneNumber, // ✅ Renamed
-        program_session: time, // ✅ Renamed
-        program_time_2: time2, // ✅ Renamed
-        program_time_3: time3, // ✅ Renamed
-        intro_to_ai_program_date: convertDateToYYYYMMDD(classDate), // ✅ Ensure format
-        intro_to_ai_date_2: convertDateToYYYYMMDD(classDate2), // ✅ Ensure format
-        intro_to_ai_date_3: convertDateToYYYYMMDD(classDate3), // ✅ Ensure format
+        program_session: time, // ✅ Corrected field name
+        program_time_2: time2, // ✅ Corrected field name
+        program_time_3: time3, // ✅ Corrected field name
+        intro_to_ai_program_date: convertDateToISO8601(classDate),
+        intro_to_ai_date_2: convertDateToISO8601(classDate2),
+        intro_to_ai_date_3: convertDateToISO8601(classDate3), // ✅ Ensure format
         zip: postal, // ✅ Renamed
         recaptchaToken,
       };
