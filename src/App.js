@@ -77,18 +77,15 @@ function App() {
 
       console.log("✅ Generated reCAPTCHA Token:", recaptchaToken);
 
-      function convertDateToISO8601(date) {
-        if (!date) return null;
-        return moment(date, "YYYY/MM/DD").toISOString(); // ✅ Convert to ISO8601
-      }
+
       const fixProgramTime = (time) => {
         const validTimes = {
-          "10am-1pm EST/9am-12pm CST": "10am-1pm EST",
-          "2pm-5pm EST/1pm-4pm CST": "2:00PM - 500PM",
-          "6pm-9pm EST/5pm-8pm CST": "6:00PM - 9PM",
+          "10am-1pm EST/9am-12pm CST": "10am-1pm EST/9am-12pm CST",
+          "2pm-5pm EST/1pm-4pm CST": "2pm-5pm EST/1pm-4pm CST",
+          "6pm-9pm EST/5pm-8pm CST": "6pm-9pm EST/5pm-8pm CST",
           "4pm-7pm EST": "4pm-7pm EST",
         };
-        return validTimes[time] || null; // Return null if time is not valid
+        return validTimes[time] || time; // Fallback to the original value
       };
 
       // Ensure dates are converted before sending:
@@ -230,9 +227,9 @@ function App() {
               <label htmlFor="inputTime" className="form-label">Program Time</label>
               <select className="form-select form-select mb-3" value={time} onChange={(e) => setTime(e.target.value)} required>
                 <option value="">Select a time</option>
-                <option value="10am-1pm EST/9am-12pm CST">10am-1pm EST/9am-12pm CST</option>
-                <option value="2pm-5pm EST/1pm-4pm CST">2pm-5pm EST/1pm-4pm CST</option>
-                <option value="6pm-9pm EST/5pm-8pm CST">6pm-9pm EST/5pm-8pm CST</option>
+                <option value="10am-1pm EST/9am-12pm CST">10am-1pm EST</option>
+                <option value="2pm-5pm EST/1pm-4pm CST">2pm-5pm EST</option>
+                <option value="6pm-9pm EST/5pm-8pm CST">6pm-9pm EST</option>
                 <option value="4pm-7pm EST">4pm-7pm EST</option>
               </select>
             </div>
@@ -240,9 +237,9 @@ function App() {
               <label htmlFor="inputTime2" className="form-label">Program Time 2</label>
               <select className="form-select form-select mb-3" value={time2} onChange={(e) => setTime2(e.target.value)} required>
                 <option value="">Select a time</option>
-                <option value="10am-1pm EST/9am-12pm CST">10am-1pm EST/9am-12pm CST</option>
-                <option value="2pm-5pm EST/1pm-4pm CST">2pm-5pm EST/1pm-4pm CST</option>
-                <option value="6pm-9pm EST/5pm-8pm CST">6pm-9pm EST/5pm-8pm CST</option>
+                <option value="10am-1pm EST/9am-12pm CST">10am-1pm EST</option>
+                <option value="2pm-5pm EST/1pm-4pm CST">2pm-5pm EST</option>
+                <option value="6pm-9pm EST/5pm-8pm CST">6pm-9pm EST</option>
                 <option value="4pm-7pm EST">4pm-7pm EST</option>
               </select>
             </div>
@@ -250,9 +247,9 @@ function App() {
               <label htmlFor="inputTime3" className="form-label">Program Time 3</label>
               <select className="form-select form-select mb-3" value={time3} onChange={(e) => setTime3(e.target.value)} required>
                 <option value="">Select a time</option>
-                <option value="10am-1pm EST/9am-12pm CST">10am-1pm EST/9am-12pm CST</option>
-                <option value="2pm-5pm EST/1pm-4pm CST">2pm-5pm EST/1pm-4pm CST</option>
-                <option value="6pm-9pm EST/5pm-8pm CST">6pm-9pm EST/5pm-8pm CST</option>
+                <option value="10am-1pm EST/9am-12pm CST">10am-1pm EST</option>
+                <option value="2pm-5pm EST/1pm-4pm CST">2pm-5pm EST</option>
+                <option value="6pm-9pm EST/5pm-8pm CST">6pm-9pm EST</option>
                 <option value="4pm-7pm EST">4pm-7pm EST</option>
               </select>
             </div>
