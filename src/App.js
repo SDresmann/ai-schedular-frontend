@@ -90,7 +90,7 @@ function App() {
         };
         return validTimes[time] || null; // Return null if time is not valid
       };
-      
+
       // Ensure dates are converted before sending:
       const formData = {
         firstname: firstName,
@@ -107,28 +107,28 @@ function App() {
         recaptchaToken,
       };
 
-function convertDateToMidnightISO(date) {
-  if (!date) {
-    console.warn("⚠️ No date provided for conversion.");
-    return null;
-  }
+      function convertDateToMidnightISO(date) {
+        if (!date) {
+          console.warn("⚠️ No date provided for conversion.");
+          return null;
+        }
 
-  // Attempt to parse the date in both formats
-  const parsedDate =
-    moment(date, "YYYY/MM/DD", true).isValid() // Strict check for "YYYY/MM/DD"
-      ? moment(date, "YYYY/MM/DD", true)
-      : moment(date, "MM/DD/YYYY", true); // Fallback to "MM/DD/YYYY"
+        // Attempt to parse the date in both formats
+        const parsedDate =
+          moment(date, "YYYY/MM/DD", true).isValid() // Strict check for "YYYY/MM/DD"
+            ? moment(date, "YYYY/MM/DD", true)
+            : moment(date, "MM/DD/YYYY", true); // Fallback to "MM/DD/YYYY"
 
-  if (!parsedDate.isValid()) {
-    console.error(`❌ Invalid date format: ${date}. Expected formats: YYYY/MM/DD or MM/DD/YYYY`);
-    return null;
-  }
+        if (!parsedDate.isValid()) {
+          console.error(`❌ Invalid date format: ${date}. Expected formats: YYYY/MM/DD or MM/DD/YYYY`);
+          return null;
+        }
 
-  return parsedDate.startOf("day").toISOString(); // Convert to ISO8601 at midnight UTC
-}
-      
+        return parsedDate.startOf("day").toISOString(); // Convert to ISO8601 at midnight UTC
+      }
+
       console.log("🚀 Sending Form Data:", formData);
-      
+
 
       console.log("🚀 Sending Final Form Data:", formData);
 
@@ -229,6 +229,7 @@ function convertDateToMidnightISO(date) {
             <div className="col-md-6">
               <label htmlFor="inputTime" className="form-label">Program Time</label>
               <select className="form-select form-select mb-3" value={time} onChange={(e) => setTime(e.target.value)} required>
+                <option value="">Select a time</option>
                 <option value="10am-1pm EST/9am-12pm CST">10am-1pm EST/9am-12pm CST</option>
                 <option value="2pm-5pm EST/1pm-4pm CST">2pm-5pm EST/1pm-4pm CST</option>
                 <option value="6pm-9pm EST/5pm-8pm CST">6pm-9pm EST/5pm-8pm CST</option>
@@ -238,6 +239,7 @@ function convertDateToMidnightISO(date) {
             <div className="col-md-6">
               <label htmlFor="inputTime2" className="form-label">Program Time 2</label>
               <select className="form-select form-select mb-3" value={time2} onChange={(e) => setTime2(e.target.value)} required>
+                <option value="">Select a time</option>
                 <option value="10am-1pm EST/9am-12pm CST">10am-1pm EST/9am-12pm CST</option>
                 <option value="2pm-5pm EST/1pm-4pm CST">2pm-5pm EST/1pm-4pm CST</option>
                 <option value="6pm-9pm EST/5pm-8pm CST">6pm-9pm EST/5pm-8pm CST</option>
@@ -247,6 +249,7 @@ function convertDateToMidnightISO(date) {
             <div className="col-md-6">
               <label htmlFor="inputTime3" className="form-label">Program Time 3</label>
               <select className="form-select form-select mb-3" value={time3} onChange={(e) => setTime3(e.target.value)} required>
+                <option value="">Select a time</option>
                 <option value="10am-1pm EST/9am-12pm CST">10am-1pm EST/9am-12pm CST</option>
                 <option value="2pm-5pm EST/1pm-4pm CST">2pm-5pm EST/1pm-4pm CST</option>
                 <option value="6pm-9pm EST/5pm-8pm CST">6pm-9pm EST/5pm-8pm CST</option>
