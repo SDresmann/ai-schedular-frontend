@@ -106,9 +106,18 @@ function App() {
         zip: postal, // ✅ Renamed
         recaptchaToken,
       };
+      
       function convertDateToMidnightISO(date) {
-        if (!date) return null;
-        return moment(date, "YYYY/MM/DD").startOf("day").toISOString(); // ✅ Forces 00:00 UTC
+        if (!date) {
+          console.warn("⚠️ No date provided for conversion.");
+          return null;
+        }
+        const parsedDate = moment(date, "YYYY/MM/DD", true); // Strict parsing
+        if (!parsedDate.isValid()) {
+          console.error(`❌ Invalid date format: ${date}. Expected format: YYYY/MM/DD`);
+          return null;
+        }
+        return parsedDate.startOf("day").toISOString(); // Convert to ISO8601 at midnight UTC
       }
       
       console.log("🚀 Sending Form Data:", formData);
