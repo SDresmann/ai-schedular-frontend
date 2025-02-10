@@ -83,27 +83,30 @@ function App() {
       }
       
       
-      const formData = {
-        firstname: firstName,
-        lastname: lastName,
-        email,
-        phone: phoneNumber,
-        program_session: fixProgramTime(time), // ✅ Ensure valid HubSpot format
-        program_time_2: fixProgramTime(time2), // ✅ Ensure valid HubSpot format
-        program_time_3: fixProgramTime(time3), // ✅ Ensure valid HubSpot format
-        intro_to_ai_program_date: convertDateToMidnightISO(classDate), // ✅ Fixed date
-        intro_to_ai_date_2: convertDateToMidnightISO(classDate2), // ✅ Fixed date
-        intro_to_ai_date_3: convertDateToMidnightISO(classDate3), // ✅ Fixed date
-        zip: postal,
-        recaptchaToken,
-      };
-      
-      // 🔥 Fix: Convert date to Midnight UTC
-      function convertDateToMidnightISO(date) {
-        if (!date) return null;
-        return moment(date, "YYYY/MM/DD").startOf("day").toISOString(); // ✅ Forces 00:00 UTC
-      }
-      
+const formData = {
+  firstname: firstName,
+  lastname: lastName,
+  email,
+  phone: phoneNumber,
+  program_session: fixProgramTime(time), // ✅ Ensure valid HubSpot format
+  program_time_2: fixProgramTime(time2), // ✅ Ensure valid HubSpot format
+  program_time_3: fixProgramTime(time3), // ✅ Ensure valid HubSpot format
+  intro_to_ai_program_date: convertDateToMidnightISO(classDate), // ✅ Fixed date
+  intro_to_ai_date_2: convertDateToMidnightISO(classDate2), // ✅ Fixed date
+  intro_to_ai_date_3: convertDateToMidnightISO(classDate3), // ✅ Fixed date
+  zip: postal,
+  recaptchaToken,
+};
+function convertDateToMidnightISO(date) {
+  if (!date) return null;
+  return moment(date, "YYYY/MM/DD").startOf("day").toISOString(); // ✅ Forces 00:00 UTC
+}
+// 🔥 Fix: Convert date to Midnight UTC
+function convertDateToMidnightISO(date) {
+  if (!date) return null;
+  return moment(date, "YYYY/MM/DD").startOf("day").toISOString(); // ✅ Forces 00:00 UTC
+}
+
       console.log("🚀 Sending Form Data:", formData);
       
 
