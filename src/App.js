@@ -84,20 +84,20 @@ function App() {
       
       // Ensure dates are converted before sending:
       const formData = {
-        firstName,
-        lastName,
+        firstname: firstName,
+        lastname: lastName,
         email,
-        phoneNumber,
-        program,
-        time,
-        time2,
-        time3,
-        classDate: convertDateToYYYYMMDD(classDate), // ✅ FIXED
-        classDate2: convertDateToYYYYMMDD(classDate2), // ✅ FIXED
-        classDate3: convertDateToYYYYMMDD(classDate3), // ✅ FIXED
-        postal,
+        phone: phoneNumber, // ✅ Renamed
+        program_session: time, // ✅ Renamed
+        program_time_2: time2, // ✅ Renamed
+        program_time_3: time3, // ✅ Renamed
+        intro_to_ai_program_date: convertDateToYYYYMMDD(classDate), // ✅ Ensure format
+        intro_to_ai_date_2: convertDateToYYYYMMDD(classDate2), // ✅ Ensure format
+        intro_to_ai_date_3: convertDateToYYYYMMDD(classDate3), // ✅ Ensure format
+        zip: postal, // ✅ Renamed
         recaptchaToken,
       };
+      
       
       console.log("🚀 Sending Form Data:", formData);
       
