@@ -106,19 +106,26 @@ function App() {
         zip: postal, // ✅ Renamed
         recaptchaToken,
       };
-      
-      function convertDateToMidnightISO(date) {
-        if (!date) {
-          console.warn("⚠️ No date provided for conversion.");
-          return null;
-        }
-        const parsedDate = moment(date, "YYYY/MM/DD", true); // Strict parsing
-        if (!parsedDate.isValid()) {
-          console.error(`❌ Invalid date format: ${date}. Expected format: YYYY/MM/DD`);
-          return null;
-        }
-        return parsedDate.startOf("day").toISOString(); // Convert to ISO8601 at midnight UTC
-      }
+
+function convertDateToMidnightISO(date) {
+  if (!date) {
+    console.warn("⚠️ No date provided for conversion.");
+    return null;
+  }
+
+  // Attempt to parse the date in both formats
+  const parsedDate =
+    moment(date, "YYYY/MM/DD", true).isValid() // Strict check for "YYYY/MM/DD"
+      ? moment(date, "YYYY/MM/DD", true)
+      : moment(date, "MM/DD/YYYY", true); // Fallback to "MM/DD/YYYY"
+
+  if (!parsedDate.isValid()) {
+    console.error(`❌ Invalid date format: ${date}. Expected formats: YYYY/MM/DD or MM/DD/YYYY`);
+    return null;
+  }
+
+  return parsedDate.startOf("day").toISOString(); // Convert to ISO8601 at midnight UTC
+}
       
       console.log("🚀 Sending Form Data:", formData);
       
