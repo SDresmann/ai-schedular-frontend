@@ -18,7 +18,7 @@ function App() {
   const [postal, setPostal] = useState('');
   const [termsChecked, setTermsChecked] = useState(false);
   const [validDates, setValidDates] = useState([]);
-  const { executeRecaptcha } = useGoogleReCaptcha(); // Use reCAPTCHA hook
+  // const { executeRecaptcha } = useGoogleReCaptcha(); // Use reCAPTCHA hook
 
   // Generate valid program dates
   function getNextValidProgramDates(selectedDate) {
@@ -49,36 +49,30 @@ function App() {
 
 
 
-  useEffect(() => {
-    if (!executeRecaptcha) {
-      console.warn("⚠️ reCAPTCHA is NOT ready. Retrying in 1 second...");
+  // useEffect(() => {
+  //   if (!executeRecaptcha) {
+  //     console.warn("⚠️ reCAPTCHA is NOT ready. Retrying in 1 second...");
 
-      const interval = setInterval(() => {
-        if (executeRecaptcha) {
-          console.log("✅ reCAPTCHA is now ready.");
-          clearInterval(interval);
-        }
-      }, 1000); // Check every second
+  //     const interval = setInterval(() => {
+  //       if (executeRecaptcha) {
+  //         console.log("✅ reCAPTCHA is now ready.");
+  //         clearInterval(interval);
+  //       }
+  //     }, 1000); // Check every second
 
-      return () => clearInterval(interval);
-    } else {
-      console.log("✅ reCAPTCHA is ready.");
-    }
-  }, [executeRecaptcha]);
+  //     return () => clearInterval(interval);
+  //   } else {
+  //     console.log("✅ reCAPTCHA is ready.");
+  //   }
+  // }, [executeRecaptcha]
+  // );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!executeRecaptcha) {
-      alert("❌ reCAPTCHA is not initialized!");
-      return;
-    }
+
 
     try {
-      console.log("⚡ Generating reCAPTCHA Token...");
-      const recaptchaToken = await executeRecaptcha("submit_form");
-
-      console.log("✅ Generated reCAPTCHA Token:", recaptchaToken);
 
 
       const fixProgramTime = (time) => {
@@ -104,7 +98,7 @@ function App() {
         intro_to_ai_date_2: convertDateToMidnightISO(classDate2), // ✅ Fixed date
         intro_to_ai_date_3: convertDateToMidnightISO(classDate3), // ✅ Fixed date
         zip: postal, // ✅ Renamed
-        recaptchaToken,
+        // recaptchaToken,
       };
         console.log("🚀 Sending Form Data:", formData);
       function convertDateToMidnightISO(date) {
@@ -149,7 +143,7 @@ function App() {
 
 
   return (
-    <GoogleReCaptchaProvider reCaptchaKey='6LcRLocqAAAAAJS6nXWzXbYLuYjLbqgLdHInE-4N'>
+    // <GoogleReCaptchaProvider reCaptchaKey='6LcRLocqAAAAAJS6nXWzXbYLuYjLbqgLdHInE-4N'>
       <div className="App">
         <div className="container">
           <form className="row g-3" onSubmit={handleSubmit}>
@@ -329,7 +323,7 @@ function App() {
           </form>
         </div>
       </div>
-    </GoogleReCaptchaProvider>
+    // </GoogleReCaptchaProvider>
   );
 }
 
