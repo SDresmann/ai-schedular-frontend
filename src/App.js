@@ -38,7 +38,10 @@ function App() {
 
     return validDates;
   }
-
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.ready.then((registration) => registration.unregister());
+  }
+  
   useEffect(() => {
     const dates = getNextValidProgramDates();
     setValidDates(dates);
@@ -103,7 +106,7 @@ function App() {
         zip: postal, // ✅ Renamed
         recaptchaToken,
       };
-      console.log("🚀 Sending Form Data:", formData);
+        console.log("🚀 Sending Form Data:", formData);
       function convertDateToMidnightISO(date) {
         if (!date) {
           console.warn("⚠️ No date provided for conversion.");
