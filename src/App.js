@@ -115,7 +115,7 @@ function App() {
 
         // Attempt to parse the date in both formats
         const parsedDate =
-          moment(date, "MM/DD/YYYY", true).isValid() // Strict check for "YYYY/MM/DD"
+          moment(date, "YYYY/MM/DD", true).isValid() // Strict check for "YYYY/MM/DD"
             ? moment(date, "YYYY/MM/DD", true)
             : moment(date, "MM/DD/YYYY", true); // Fallback to "MM/DD/YYYY"
 
