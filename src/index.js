@@ -3,12 +3,13 @@ import ReactDOM from 'react-dom/client';
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 import App from './App';
 
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
   <React.StrictMode>
     <GoogleReCaptchaProvider
-      reCaptchaKey={process.env.REACT_APP_SITE_KEY}
+      reCaptchaKey='6LcRLocqAAAAAJS6nXWzXbYLuYjLbqgLdHInE-4N'
       scriptProps={{
         async: true,
         defer: true,
