@@ -98,18 +98,18 @@ function App() {
       });
       // Ensure dates are converted before sending:
       const formData = {
-        firstname: String(firstname || ""), // Ensure it's a string
-        lastname: String(lastname || ""),
+        firstname: String(firstName || ""), // Ensure it's a string
+        lastname: String(lastName || ""),
         email: String(email || ""),
-        phone: String(phone || ""),
+        phone: String(phoneNumber || ""),
         zip: String(postal || ""),
-        program_session: String(program_session || ""),
-        program_time_2: String(program_time_2 || ""),
-        program_time_3: String(program_time_3 || ""),
-        intro_to_ai_program_date: String(intro_to_ai_program_date || ""),
-        intro_to_ai_date_2: String(intro_to_ai_date_2 || ""),
-        intro_to_ai_date_3: String(intro_to_ai_date_3 || ""),
-        recaptchaToken,
+        program_session: String(time || ""),
+        program_time_2: String(time2 || ""),
+        program_time_3: String(time3 || ""),
+        intro_to_ai_program_date: String(convertDateToMidnightISO(classDate) || ""),
+        intro_to_ai_date_2: String(convertDateToMidnightISO(classDate2) || ""),
+        intro_to_ai_date_3: String(convertDateToMidnightISO(classDate3) || ""),
+        recaptchaToken: String(recaptchaToken || ""),
       };
       console.log("Payload Sent to Backend:", {
         program_session: fixProgramTime(time),
