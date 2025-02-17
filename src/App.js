@@ -80,6 +80,7 @@ function App() {
 
       console.log("✅ Generated reCAPTCHA Token:", recaptchaToken);
 
+      console.log("Raw Times:", { time, time2, time3 });
 
       const fixProgramTime = (time) => {
         const validTimes = {
@@ -90,22 +91,31 @@ function App() {
         };
         return validTimes[time] || null; // Fallback to the original value
       };
-
+      console.log("Fixed Times:", {
+        program_session: fixProgramTime(time),
+        program_time_2: fixProgramTime(time2),
+        program_time_3: fixProgramTime(time3),
+      });
       // Ensure dates are converted before sending:
       const formData = {
-        firstname: firstName,
-        lastname: lastName,
-        email,
-        phone: phoneNumber, // ✅ Renamed
-        program_session: fixProgramTime(time), // Ensure this is in the expected format
-        program_time_2: fixProgramTime(time2), // Ensure this is in the expected format
-        program_time_3: fixProgramTime(time3), // Ensure this is in the expected format
-        intro_to_ai_program_date: convertDateToMidnightISO(classDate), // ✅ Fixed date
-        intro_to_ai_date_2: convertDateToMidnightISO(classDate2), // ✅ Fixed date
-        intro_to_ai_date_3: convertDateToMidnightISO(classDate3), // ✅ Fixed date
-        zip: postal, // ✅ Renamed
+        firstname: String(firstname || ""), // Ensure it's a string
+        lastname: String(lastname || ""),
+        email: String(email || ""),
+        phone: String(phone || ""),
+        zip: String(postal || ""),
+        program_session: String(program_session || ""),
+        program_time_2: String(program_time_2 || ""),
+        program_time_3: String(program_time_3 || ""),
+        intro_to_ai_program_date: String(intro_to_ai_program_date || ""),
+        intro_to_ai_date_2: String(intro_to_ai_date_2 || ""),
+        intro_to_ai_date_3: String(intro_to_ai_date_3 || ""),
         recaptchaToken,
       };
+      console.log("Payload Sent to Backend:", {
+        program_session: fixProgramTime(time),
+        program_time_2: fixProgramTime(time2),
+        program_time_3: fixProgramTime(time3),
+      });
         console.log("🚀 Sending Form Data:", formData);
       function convertDateToMidnightISO(date) {
         if (!date) {
