@@ -181,6 +181,7 @@ function App() {
                 type="text"
                 className="form-control"
                 id="inputLast"
+                name='lastName'
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 required
