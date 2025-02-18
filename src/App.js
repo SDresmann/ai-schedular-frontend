@@ -68,20 +68,20 @@ function App() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (!executeRecaptcha) {
       alert("❌ reCAPTCHA is not initialized!");
       return;
     }
-
+  
     try {
       console.log("⚡ Generating reCAPTCHA Token...");
       const recaptchaToken = await executeRecaptcha("submit_form");
-
+  
       console.log("✅ Generated reCAPTCHA Token:", recaptchaToken);
-
+  
       console.log("Raw Times:", { time, time2, time3 });
-
+  
       const fixProgramTime = (time) => {
         const validTimes = {
           "10am-1pm EST/9am-12pm CST": "10am-1pm EST/9am-12pm CST",
@@ -96,6 +96,7 @@ function App() {
         program_time_2: fixProgramTime(time2),
         program_time_3: fixProgramTime(time3),
       });
+  
       // Ensure dates are converted before sending:
       const formData = {
         firstname: firstName,
@@ -105,10 +106,9 @@ function App() {
         program_session: fixProgramTime(time), // Ensure this is in the expected format
         program_time_2: fixProgramTime(time2), // Ensure this is in the expected format
         program_time_3: fixProgramTime(time3), // Ensure this is in the expected format
-        intro_to_ai_program_date: classDate ? moment(classDate).format('MM/DD/YYYY') : null, 
-        intro_to_ai_date_2: classDate2 ? moment(classDate2).format('MM/DD/YYYY') : null, 
-        intro_to_ai_date_3: classDate3 ? moment(classDate3).format('MM/DD/YYYY') : null, 
-
+        intro_to_ai_program_date: convertDateToMidnightISO(classDate), // ✅ Fixed date
+        intro_to_ai_date_2: convertDateToMidnightISO(classDate2), // ✅ Fixed date
+        intro_to_ai_date_3: convertDateToMidnightISO(classDate3), // ✅ Fixed date
         zip: postal, // ✅ Renamed
         recaptchaToken,
       };
@@ -117,38 +117,36 @@ function App() {
         program_time_2: fixProgramTime(time2),
         program_time_3: fixProgramTime(time3),
       });
-        console.log("🚀 Sending Form Data:", formData);
+      console.log("🚀 Sending Form Data:", formData);
+  
       function convertDateToMidnightISO(date) {
         if (!date) {
           console.warn("⚠️ No date provided for conversion.");
           return null;
         }
-
+  
         // Attempt to parse the date in both formats
         const parsedDate =
           moment(date, "YYYY/MM/DD", true).isValid() // Strict check for "YYYY/MM/DD"
             ? moment(date, "YYYY/MM/DD", true)
             : moment(date, "MM/DD/YYYY", true); // Fallback to "MM/DD/YYYY"
-
+  
         if (!parsedDate.isValid()) {
           console.error(`❌ Invalid date format: ${date}. Expected formats: YYYY/MM/DD or MM/DD/YYYY`);
           return null;
         }
-
+  
         return parsedDate.startOf("day").toISOString(); // Convert to ISO8601 at midnight UTC
       }
-
-      console.log("🚀 Sending Form Data:", formData);
-
-
+  
       console.log("🚀 Sending Final Form Data:", formData);
-
+  
       const response = await axios.post(
         "https://ai-schedular-backend.onrender.com/api/intro-to-ai-payment",
         formData,
         { headers: { "Content-Type": "application/json" } }
       );
-
+  
       console.log("✅ Form submission response:", response.data);
       alert("Form submitted successfully!");
     } catch (error) {
@@ -156,6 +154,7 @@ function App() {
       alert("Error submitting form. Please try again.");
     }
   };
+  
 
 
 
