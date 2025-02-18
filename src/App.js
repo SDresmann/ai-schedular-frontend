@@ -64,7 +64,12 @@ function App() {
 
       console.log('Form Data Sent to Backend:', formData);
 
-      const response = await axios.post('https://ai-schedular-backend.onrender.com/api/intro-to-ai-payment', formData);
+      const response = await axios.post('https://your-backend-url/your-endpoint', formData, {
+        withCredentials: true, //  <-- Important for sending credentials
+        headers: {
+          'Content-Type': 'application/json' 
+        }
+      })
 
       console.log('Form submission response:', response.data);
       alert('Form submitted successfully!');
