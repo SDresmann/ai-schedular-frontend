@@ -164,7 +164,7 @@ function App() {
         <div className="container">
           <form className="row g-3" onSubmit={handleSubmit}>
             <div className="col-md-6">
-              <label htmlFor="inputName" name="firstName" className="form-label">First Name</label>
+              <label name="inputName" name="firstName" className="form-label">First Name</label>
               <input
                 type="text"
                 className="form-control"
@@ -176,7 +176,7 @@ function App() {
             </div>
 
             <div className="col-md-6">
-              <label htmlFor="inputLast" name="lastName" className="form-label">Last Name</label>
+              <label name="inputLast" name="lastName" className="form-label">Last Name</label>
               <input
                 type="text"
                 className="form-control"
@@ -189,7 +189,7 @@ function App() {
             </div>
 
             <div className="col-6">
-              <label htmlFor="inputEmail" className="form-label">Email</label>
+              <label name="inputEmail" className="form-label">Email</label>
               <input
                 type="email"
                 className="form-control"
@@ -202,7 +202,7 @@ function App() {
             </div>
 
             <div className="col-6">
-              <label htmlFor="inputPhone" className="form-label">Phone Number</label>
+              <label name="inputPhone" className="form-label">Phone Number</label>
               <input
                 type="text"
                 className="form-control"
@@ -228,7 +228,7 @@ function App() {
             </div>
 
             <div className="col-md-12">
-              <label htmlFor="inputZip" className="form-label">Postal Code</label>
+              <label name="inputZip" className="form-label">Postal Code</label>
               <input
                 type="text"
                 className="form-control"
@@ -241,7 +241,7 @@ function App() {
             </div>
 
             <div className="col-md-6">
-              <label htmlFor="inputTime" className="form-label">Program Time</label>
+              <label name="inputTime" className="form-label">Program Time</label>
               <select className="form-select form-select mb-3" name="time" value={time} onChange={(e) => setTime(e.target.value)} required>
                 <option value="">Select a time</option>
                 <option value="10am-1pm EST/9am-12pm CST">10am-1pm EST</option>
@@ -251,7 +251,7 @@ function App() {
               </select>
             </div>
             <div className="col-md-6">
-              <label htmlFor="inputTime2" className="form-label">Program Time 2</label>
+              <label name="inputTime2" className="form-label">Program Time 2</label>
               <select className="form-select form-select mb-3" name="time2"  value={time2} onChange={(e) => setTime2(e.target.value)} required>
                 <option value="">Select a time</option>
                 <option value="10am-1pm EST/9am-12pm CST">10am-1pm EST</option>
@@ -261,7 +261,7 @@ function App() {
               </select>
             </div>
             <div className="col-md-6">
-              <label htmlFor="inputTime3" className="form-label">Program Time 3</label>
+              <label name="inputTime3" className="form-label">Program Time 3</label>
               <select className="form-select form-select mb-3" name="time3" value={time3} onChange={(e) => setTime3(e.target.value)} required>
                 <option value="">Select a time</option>
                 <option value="10am-1pm EST/9am-12pm CST">10am-1pm EST</option>
@@ -272,7 +272,7 @@ function App() {
             </div>
 
             <div className="col-md-6">
-              <label htmlFor="inputDate" className="form-label">Class Date</label>
+              <label name="inputDate" className="form-label">Class Date</label>
               <select
                 className="form-select form-select mb-3"
                 id="inputDate"
@@ -290,7 +290,7 @@ function App() {
               </select>
             </div>
             <div className="col-md-6">
-              <label htmlFor="inputDate" className="form-label">Class Date</label>
+              <label name="inputDate" className="form-label">Class Date</label>
               <select
                 className="form-select form-select mb-3"
                 id="inputDate"
@@ -308,7 +308,7 @@ function App() {
               </select>
             </div>
             <div className="col-md-6">
-              <label htmlFor="inputDate" className="form-label">Class Date</label>
+              <label name="inputDate" className="form-label">Class Date</label>
               <select
                 className="form-select form-select mb-3"
                 id="inputDate"
@@ -335,7 +335,7 @@ function App() {
                   onChange={(e) => setTermsChecked(e.target.checked)}
                   required
                 />
-                <label className="form-check-label" htmlFor="gridCheck">
+                <label className="form-check-label" name="gridCheck">
                   By providing your contact information, you agree to be contacted by us.
                 </label>
               </div>
