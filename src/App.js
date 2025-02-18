@@ -106,9 +106,9 @@ function App() {
         program_session: fixProgramTime(time), // Ensure this is in the expected format
         program_time_2: fixProgramTime(time2), // Ensure this is in the expected format
         program_time_3: fixProgramTime(time3), // Ensure this is in the expected format
-        intro_to_ai_program_date: convertDateToMidnightISO(classDate), // ✅ Fixed date
-        intro_to_ai_date_2: convertDateToMidnightISO(classDate2), // ✅ Fixed date
-        intro_to_ai_date_3: convertDateToMidnightISO(classDate3), // ✅ Fixed date
+        intro_to_ai_program_date: classDate ? moment(classDate, 'MM/DD/YYYY').format('YYYY-MM-DD') : null, 
+        intro_to_ai_date_2: classDate2 ? moment(classDate2, 'MM/DD/YYYY').format('YYYY-MM-DD') : null, 
+        intro_to_ai_date_3: classDate3 ? moment(classDate3, 'MM/DD/YYYY').format('YYYY-MM-DD') : null, // ✅ Fixed date
         zip: postal, // ✅ Renamed
         recaptchaToken,
       };
