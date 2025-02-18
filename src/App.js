@@ -164,7 +164,7 @@ function App() {
         <div className="container">
           <form className="row g-3" onSubmit={handleSubmit}>
             <div className="col-md-6">
-              <label htmlFor="inputName" className="form-label">First Name</label>
+              <label htmlFor="inputName" name="firstName" className="form-label">First Name</label>
               <input
                 type="text"
                 className="form-control"
@@ -176,7 +176,7 @@ function App() {
             </div>
 
             <div className="col-md-6">
-              <label htmlFor="inputLast" className="form-label">Last Name</label>
+              <label htmlFor="inputLast" name="lastName" className="form-label">Last Name</label>
               <input
                 type="text"
                 className="form-control"
@@ -192,6 +192,7 @@ function App() {
               <input
                 type="email"
                 className="form-control"
+                name='email'
                 id="inputEmail"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -204,6 +205,7 @@ function App() {
               <input
                 type="text"
                 className="form-control"
+                name='phoneNumber'
                 id="inputPhone"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
@@ -229,6 +231,7 @@ function App() {
               <input
                 type="text"
                 className="form-control"
+                name="postal" 
                 id="inputZip"
                 value={postal}
                 onChange={(e) => setPostal(e.target.value)}
@@ -238,7 +241,7 @@ function App() {
 
             <div className="col-md-6">
               <label htmlFor="inputTime" className="form-label">Program Time</label>
-              <select className="form-select form-select mb-3" value={time} onChange={(e) => setTime(e.target.value)} required>
+              <select className="form-select form-select mb-3" name="time" value={time} onChange={(e) => setTime(e.target.value)} required>
                 <option value="">Select a time</option>
                 <option value="10am-1pm EST/9am-12pm CST">10am-1pm EST</option>
                 <option value="2pm-5pm EST/1pm-4pm CST">2pm-5pm EST</option>
@@ -248,7 +251,7 @@ function App() {
             </div>
             <div className="col-md-6">
               <label htmlFor="inputTime2" className="form-label">Program Time 2</label>
-              <select className="form-select form-select mb-3" value={time2} onChange={(e) => setTime2(e.target.value)} required>
+              <select className="form-select form-select mb-3" name="time2"  value={time2} onChange={(e) => setTime2(e.target.value)} required>
                 <option value="">Select a time</option>
                 <option value="10am-1pm EST/9am-12pm CST">10am-1pm EST</option>
                 <option value="2pm-5pm EST/1pm-4pm CST">2pm-5pm EST</option>
@@ -258,7 +261,7 @@ function App() {
             </div>
             <div className="col-md-6">
               <label htmlFor="inputTime3" className="form-label">Program Time 3</label>
-              <select className="form-select form-select mb-3" value={time3} onChange={(e) => setTime3(e.target.value)} required>
+              <select className="form-select form-select mb-3" name="time3" value={time3} onChange={(e) => setTime3(e.target.value)} required>
                 <option value="">Select a time</option>
                 <option value="10am-1pm EST/9am-12pm CST">10am-1pm EST</option>
                 <option value="2pm-5pm EST/1pm-4pm CST">2pm-5pm EST</option>
@@ -272,6 +275,7 @@ function App() {
               <select
                 className="form-select form-select mb-3"
                 id="inputDate"
+                name="classDate"
                 value={classDate}
                 onChange={(e) => setClassDate(e.target.value)}
                 required
@@ -289,6 +293,7 @@ function App() {
               <select
                 className="form-select form-select mb-3"
                 id="inputDate"
+                name="classDate2"
                 value={classDate2}
                 onChange={(e) => setClassDate2(e.target.value)}
                 required
@@ -306,6 +311,7 @@ function App() {
               <select
                 className="form-select form-select mb-3"
                 id="inputDate"
+                name="classDate3"
                 value={classDate3}
                 onChange={(e) => setClassDate3(e.target.value)}
                 required
