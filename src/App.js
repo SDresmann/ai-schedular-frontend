@@ -214,7 +214,7 @@ function App() {
             </div>
 
             <div className="col-12">
-              <button type="submit" className="btn btn-primary">Submit</button>
+              <button type="submit" className="btn">Submit</button>
             </div>
           </form>
         </div>
