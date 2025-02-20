@@ -134,6 +134,23 @@ function App() {
             </div>
 
             <div className="col-md-6">
+              <label htmlFor="inputDate" className="form-label">Class Date 1</label>
+              <select
+                className="form-select form-select mb-3"
+                id="inputDate"
+                value={classDate}
+                onChange={(e) => setClassDate(e.target.value)}
+                required
+              >
+                <option value="">Please select a date</option>
+                {validDates.map((date, index) => (
+                  <option key={index} value={moment(date).format('MM/DD/YYYY')}>
+                    {moment(date).format('MM/DD/YYYY')}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="col-md-6">
               <label htmlFor="inputTime" className="form-label">Program Time 1</label>
               <select
                 className="form-select form-select mb-3"
@@ -148,12 +165,12 @@ function App() {
               </select>
             </div>
             <div className="col-md-6">
-              <label htmlFor="inputDate" className="form-label">Class Date 1</label>
+              <label htmlFor="inputDate" className="form-label">Class Date 2</label>
               <select
                 className="form-select form-select mb-3"
                 id="inputDate"
-                value={classDate}
-                onChange={(e) => setClassDate(e.target.value)}
+                value={classDate2}
+                onChange={(e) => setClassDate2(e.target.value)}
                 required
               >
                 <option value="">Please select a date</option>
@@ -179,23 +196,6 @@ function App() {
               </select>
             </div>
 
-            <div className="col-md-6">
-              <label htmlFor="inputDate" className="form-label">Class Date 2</label>
-              <select
-                className="form-select form-select mb-3"
-                id="inputDate"
-                value={classDate2}
-                onChange={(e) => setClassDate2(e.target.value)}
-                required
-              >
-                <option value="">Please select a date</option>
-                {validDates.map((date, index) => (
-                  <option key={index} value={moment(date).format('MM/DD/YYYY')}>
-                    {moment(date).format('MM/DD/YYYY')}
-                  </option>
-                ))}
-              </select>
-            </div>
 
             <div className="col-12">
               <div className="form-check">
