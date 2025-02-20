@@ -10,7 +10,7 @@ function App() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [program, setProgram] = useState('');
   const [time, setTime] = useState('');
-  const [timeMore, setTimeMpre] = useState('');
+  const [time2, setTime2] = useState('');
   const [classDate, setClassDate] = useState('');
   const [classDate2, setClassDate2] = useState('');
   const [postal, setPostal] = useState('');
@@ -59,7 +59,7 @@ function App() {
         phoneNumber,
         program, // Include program in form data
         time,
-        timeMore,
+        time2,
         classDate,
         classDate2,
         postal,
@@ -180,8 +180,8 @@ function App() {
               <select
                 className="form-select form-select mb-3"
                 id="inputTime"
-                value={timeMore}
-                onChange={(e) => setTimeMore(e.target.value)}
+                value={time2}
+                onChange={(e) => setTime2(e.target.value)}
                 required
               >
                 <option value="">Select a time</option>
