@@ -13,7 +13,6 @@ function App() {
   const [time2, setTime2] = useState('');
   const [classDate, setClassDate] = useState('');
   const [classDate2, setClassDate2] = useState('');
-  const [postal, setPostal] = useState('');
   const [termsChecked, setTermsChecked] = useState(false);
   const [validDates, setValidDates] = useState([]);
   const { executeRecaptcha } = useGoogleReCaptcha(); // Use reCAPTCHA hook
@@ -57,12 +56,10 @@ function App() {
         lastName,
         email,
         phoneNumber,
-        program, // Include program in form data
         time,
         time2,
         classDate,
         classDate2,
-        postal,
         recaptchaToken, // Include the token in form data
       };
 
@@ -85,7 +82,7 @@ function App() {
 
   return (
     <GoogleReCaptchaProvider reCaptchaKey={process.env.REACT_APP_SITE_KEY}>
-      <div className="App">
+      <div className="App py-3" id='my-react-form'>
         <div className="container">
           <form className="row g-3" onSubmit={handleSubmit}>
             <div className="col-md-6">
@@ -149,20 +146,8 @@ function App() {
               </select>
             </div>
 
-            <div className="col-md-12">
-              <label htmlFor="inputZip" className="form-label">Postal Code</label>
-              <input
-                type="text"
-                className="form-control"
-                id="inputZip"
-                value={postal}
-                onChange={(e) => setPostal(e.target.value)}
-                required
-              />
-            </div>
-
             <div className="col-md-6">
-              <label htmlFor="inputTime" className="form-label">Program Time</label>
+              <label htmlFor="inputTime" className="form-label">Program Time 1</label>
               <select
                 className="form-select form-select mb-3"
                 id="inputTime"
@@ -176,22 +161,7 @@ function App() {
               </select>
             </div>
             <div className="col-md-6">
-              <label htmlFor="inputTime" className="form-label">Program Time</label>
-              <select
-                className="form-select form-select mb-3"
-                id="inputTime"
-                value={time2}
-                onChange={(e) => setTime2(e.target.value)}
-                required
-              >
-                <option value="">Select a time</option>
-                <option value="2pm-5pm EST/1pm-4pm CST">2pm-5pm EST</option>
-                <option value="6pm-9pm EST/5pm-8pm CST">6pm-9pm EST</option>
-              </select>
-            </div>
-
-            <div className="col-md-6">
-              <label htmlFor="inputDate" className="form-label">Class Date</label>
+              <label htmlFor="inputDate" className="form-label">Class Date 1</label>
               <select
                 className="form-select form-select mb-3"
                 id="inputDate"
@@ -208,7 +178,22 @@ function App() {
               </select>
             </div>
             <div className="col-md-6">
-              <label htmlFor="inputDate" className="form-label">Class Date</label>
+              <label htmlFor="inputTime" className="form-label">Program Time 2</label>
+              <select
+                className="form-select form-select mb-3"
+                id="inputTime"
+                value={time2}
+                onChange={(e) => setTime2(e.target.value)}
+                required
+              >
+                <option value="">Select a time</option>
+                <option value="2pm-5pm EST/1pm-4pm CST">2pm-5pm EST</option>
+                <option value="6pm-9pm EST/5pm-8pm CST">6pm-9pm EST</option>
+              </select>
+            </div>
+
+            <div className="col-md-6">
+              <label htmlFor="inputDate" className="form-label">Class Date 2</label>
               <select
                 className="form-select form-select mb-3"
                 id="inputDate"
