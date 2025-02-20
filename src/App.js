@@ -208,7 +208,7 @@ function App() {
                   required
                 />
                 <label className="form-check-label" htmlFor="gridCheck">
-                  By providing your contact information, you agree to be contacted by us.
+                o	By providing your contact information and checking the box, you agree that Kable Academy may contact you about our relevant content, products, and services via email, phone and SMS communications. SMS can be used for reminders. SMS can be used for updates. View our <a src='https://kableacademy.com/private-policy/'>Privacy Policy.</a>
                 </label>
               </div>
             </div>

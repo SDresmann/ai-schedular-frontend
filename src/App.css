@@ -36,3 +36,12 @@
     transform: rotate(360deg);
   }
 }
+
+button{
+  background-color: #6ecf81;
+  color: #172649;
+}
+
+label{
+  color: #172649;
+}
