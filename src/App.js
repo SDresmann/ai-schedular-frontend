@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import moment from 'moment';
 import { GoogleReCaptchaProvider, useGoogleReCaptcha } from 'react-google-recaptcha-v3';
+import {Link} from 'react-router-dom'
 
 function App() {
   const [firstName, setFirstName] = useState('');
@@ -208,7 +209,8 @@ function App() {
                   required
                 />
                 <label className="form-check-label" htmlFor="gridCheck">
-                By providing your contact information and checking the box, you agree that Kable Academy may contact you about our relevant content, products, and services via email, phone and SMS communications. SMS can be used for reminders. SMS can be used for updates. View our <a src='https://kableacademy.com/private-policy/'>Privacy Policy.</a>
+                By providing your contact information and checking the box, you agree that Kable Academy may contact you about our relevant content, products, and services via email, phone and SMS communications. SMS can be used for reminders. SMS can be used for updates. View our 
+                <a href='https://kableacademy.com/private-policy/'> Privacy Policy.</a>
                 </label>
               </div>
             </div>

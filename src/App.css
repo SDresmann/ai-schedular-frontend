@@ -8,3 +8,10 @@ label{
 button{
   background-color: #6ecf81 !important;
 }
+a{
+  z-index: 5 !important;
+}
+
+.form-check-label{
+  font-size: 13px !important;
+}
