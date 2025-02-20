@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 import App from './App';
+import './App.css'
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
