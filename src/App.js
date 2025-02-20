@@ -10,7 +10,9 @@ function App() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [program, setProgram] = useState('');
   const [time, setTime] = useState('');
+  const [time2, setTime2] = useState('');
   const [classDate, setClassDate] = useState('');
+  const [classDate2, setClassDate2] = useState('');
   const [postal, setPostal] = useState('');
   const [termsChecked, setTermsChecked] = useState(false);
   const [validDates, setValidDates] = useState([]);
@@ -57,7 +59,9 @@ function App() {
         phoneNumber,
         program, // Include program in form data
         time,
+        time2,
         classDate,
+        classDate2,
         postal,
         recaptchaToken, // Include the token in form data
       };
@@ -171,6 +175,20 @@ function App() {
                 <option value="6pm-9pm EST/5pm-8pm CST">6pm-9pm EST</option>
               </select>
             </div>
+            <div className="col-md-6">
+              <label htmlFor="inputTime" className="form-label">Program Time</label>
+              <select
+                className="form-select form-select mb-3"
+                id="inputTime"
+                value={time2}
+                onChange={(e) => setTime2(e.target.value)}
+                required
+              >
+                <option value="">Select a time</option>
+                <option value="2pm-5pm EST/1pm-4pm CST">2pm-5pm EST</option>
+                <option value="6pm-9pm EST/5pm-8pm CST">6pm-9pm EST</option>
+              </select>
+            </div>
 
             <div className="col-md-6">
               <label htmlFor="inputDate" className="form-label">Class Date</label>
@@ -179,6 +197,23 @@ function App() {
                 id="inputDate"
                 value={classDate}
                 onChange={(e) => setClassDate(e.target.value)}
+                required
+              >
+                <option value="">Please select a date</option>
+                {validDates.map((date, index) => (
+                  <option key={index} value={moment(date).format('MM/DD/YYYY')}>
+                    {moment(date).format('MM/DD/YYYY')}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="col-md-6">
+              <label htmlFor="inputDate" className="form-label">Class Date</label>
+              <select
+                className="form-select form-select mb-3"
+                id="inputDate"
+                value={classDate2}
+                onChange={(e) => setClassDate2(e.target.value)}
                 required
               >
                 <option value="">Please select a date</option>
