@@ -133,19 +133,6 @@ function App() {
               />
             </div>
 
-            <div className="col-12">
-              <label>Choose the program you are interested in</label>
-              <select
-                className="form-select"
-                value={program}
-                onChange={(e) => setProgram(e.target.value)}
-                required
-              >
-                <option value="">Choose a Program</option>
-                <option value="Intro to AI">Intro to AI</option>
-              </select>
-            </div>
-
             <div className="col-md-6">
               <label htmlFor="inputTime" className="form-label">Program Time 1</label>
               <select
