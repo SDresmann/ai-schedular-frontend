@@ -1,10 +1,10 @@
 *{
-  color: #172649;
+  color: #172649 !important;
 }
 label{
-  color: #172649;
+  color: #172649 !important;
 }
 
 button{
-  background-color: #6ecf81;
+  background-color: #6ecf81 !important;
 }
