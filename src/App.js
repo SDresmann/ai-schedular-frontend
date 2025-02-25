@@ -17,52 +17,69 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const { executeRecaptcha } = useGoogleReCaptcha();
 
-  // Generate 7 initial valid dates (weekdays only) starting from today+2 days
-  function getNextValidProgramDates() {
+  function getNextWeekday(date) {
+    let nextDate = moment(date);
+    while (nextDate.isoWeekday() > 5) { // isoWeekday: 6 = Saturday, 7 = Sunday
+      nextDate = nextDate.add(1, 'day');
+    }
+    return nextDate;
+  }
+
+  // Generate an initial list of 7 valid dates (weekdays only) starting from today + 2 days.
+  function getInitialValidDates() {
     const today = moment();
     const dates = [];
     let nextValidDate = today.add(2, 'days');
+    nextValidDate = getNextWeekday(nextValidDate);
 
     for (let i = 0; i < 7; i++) {
-      // Skip weekends (Saturday = 6, Sunday = 7)
-      while (nextValidDate.isoWeekday() > 5) {
-        nextValidDate = nextValidDate.add(1, 'day');
-      }
       dates.push(nextValidDate.format('MM/DD/YYYY'));
       nextValidDate = nextValidDate.add(1, 'day');
+      nextValidDate = getNextWeekday(nextValidDate);
     }
     return dates;
   }
 
-  useEffect(() => {
-    setValidDates(getNextValidProgramDates());
-  }, []);
-
-  // If both class dates are the same, block out that day and add a new future date
-  useEffect(() => {
-    if (classDate && classDate2 && classDate === classDate2) {
-      setValidDates(prevDates => {
-        if (prevDates.includes(classDate)) {
-          // Remove the booked day from the list
-          const updatedDates = prevDates.filter(date => date !== classDate);
-          // Determine a new valid date based on the last date in the list
-          const lastDateStr = prevDates[prevDates.length - 1];
-          let newDate = moment(lastDateStr, 'MM/DD/YYYY').add(1, 'day');
-          while (newDate.isoWeekday() > 5) {
-            newDate = newDate.add(1, 'day');
-          }
-          updatedDates.push(newDate.format('MM/DD/YYYY'));
-          return updatedDates;
-        }
-        return prevDates;
-      });
-      // Clear the second selection so the user must choose a new date
-      setClassDate2('');
-      alert(
-        'The selected day is fully booked and has been replaced with a new available date. Please choose a different date for Class Date 2.'
-      );
+  // Fetch fully booked dates from your backend (which in turn uses HubSpot data).
+  async function fetchFullyBookedDates() {
+    try {
+      // This endpoint should return an array of dates (formatted as MM/DD/YYYY)
+      // that are fully booked (i.e. both time slots are taken)
+      const response = await axios.get('https://ai-schedular-backend.onrender.com/api/booked-dates');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching booked dates:', error);
+      return [];
     }
-  }, [classDate, classDate2]);
+  }
+
+  // Combine the initial dates with filtering out fully booked days,
+  // and then ensure that you always have 7 available dates.
+  async function updateValidDates() {
+    const fullyBookedDates = await fetchFullyBookedDates();
+    let dates = getInitialValidDates();
+
+    // Remove dates that are fully booked
+    dates = dates.filter(date => !fullyBookedDates.includes(date));
+
+    // If the available dates drop below 7, append new future dates until there are 7
+    let lastDateStr = dates[dates.length - 1] || moment().add(2, 'days').format('MM/DD/YYYY');
+    let lastDate = moment(lastDateStr, 'MM/DD/YYYY');
+    while (dates.length < 7) {
+      lastDate = lastDate.add(1, 'day');
+      lastDate = getNextWeekday(lastDate);
+      const newDateStr = lastDate.format('MM/DD/YYYY');
+      if (!fullyBookedDates.includes(newDateStr)) {
+        dates.push(newDateStr);
+      }
+    }
+    setValidDates(dates);
+  }
+
+  // Fetch available dates on component mount and update after a booking.
+  useEffect(() => {
+    updateValidDates();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -98,13 +115,16 @@ function App() {
         {
           withCredentials: true,
           headers: {
-            'Content-Type': 'application/json',
-          },
+            'Content-Type': 'application/json'
+          }
         }
       );
 
       console.log('Form submission response:', response.data);
       alert('Form submitted successfully!');
+      
+      // After successful booking, refresh available dates.
+      updateValidDates();
     } catch (error) {
       console.error('Error during form submission:', error);
       alert('Error submitting form. Please try again.');
