@@ -17,66 +17,60 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const { executeRecaptcha } = useGoogleReCaptcha();
 
+  // Utility: Get next weekday (Monday-Friday) from a given moment date.
   function getNextWeekday(date) {
-    let nextDate = moment(date);
-    while (nextDate.isoWeekday() > 5) { // isoWeekday: 6 = Saturday, 7 = Sunday
-      nextDate = nextDate.add(1, 'day');
+    let nextDate = date.clone();
+    while (nextDate.isoWeekday() > 5) { // 6 = Saturday, 7 = Sunday
+      nextDate.add(1, 'day');
     }
     return nextDate;
   }
 
   // Generate an initial list of 7 valid dates (weekdays only) starting from today + 2 days.
   function getInitialValidDates() {
-    const today = moment();
+    const startDate = moment().add(2, 'days');
+    let nextValidDate = getNextWeekday(startDate);
     const dates = [];
-    let nextValidDate = today.add(2, 'days');
-    nextValidDate = getNextWeekday(nextValidDate);
-
     for (let i = 0; i < 7; i++) {
       dates.push(nextValidDate.format('MM/DD/YYYY'));
-      nextValidDate = nextValidDate.add(1, 'day');
-      nextValidDate = getNextWeekday(nextValidDate);
+      nextValidDate = getNextWeekday(nextValidDate.clone().add(1, 'day'));
     }
     return dates;
   }
 
-  // Fetch fully booked dates from your backend (which in turn uses HubSpot data).
-  async function fetchFullyBookedDates() {
-    try {
-      // This endpoint should return an array of dates (formatted as MM/DD/YYYY)
-      // that are fully booked (i.e. both time slots are taken)
-      const response = await axios.get('https://ai-schedular-backend.onrender.com/api/booked-dates');
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching booked dates:', error);
-      return [];
-    }
-  }
-
-  // Combine the initial dates with filtering out fully booked days,
-  // and then ensure that you always have 7 available dates.
+  // This function fetches fully booked dates from your backend and updates validDates accordingly.
   async function updateValidDates() {
-    const fullyBookedDates = await fetchFullyBookedDates();
-    let dates = getInitialValidDates();
+    try {
+      // Fetch fully booked dates from your backend endpoint
+      const response = await axios.get('https://ai-schedular-backend.onrender.com/api/booked-dates');
+      const fullyBookedDates = response.data; // Should be an array of dates in "MM/DD/YYYY"
+      console.log('Fully booked dates:', fullyBookedDates);
 
-    // Remove dates that are fully booked
-    dates = dates.filter(date => !fullyBookedDates.includes(date));
+      // Get the initial list of dates
+      let dates = getInitialValidDates();
+      console.log('Initial valid dates:', dates);
 
-    // If the available dates drop below 7, append new future dates until there are 7
-    let lastDateStr = dates[dates.length - 1] || moment().add(2, 'days').format('MM/DD/YYYY');
-    let lastDate = moment(lastDateStr, 'MM/DD/YYYY');
-    while (dates.length < 7) {
-      lastDate = lastDate.add(1, 'day');
-      lastDate = getNextWeekday(lastDate);
-      const newDateStr = lastDate.format('MM/DD/YYYY');
-      if (!fullyBookedDates.includes(newDateStr)) {
-        dates.push(newDateStr);
+      // Filter out any dates that are fully booked
+      dates = dates.filter(date => !fullyBookedDates.includes(date));
+      console.log('Dates after filtering:', dates);
+
+      // If we have fewer than 7 dates, append new dates until we have 7
+      let lastDateStr = dates.length ? dates[dates.length - 1] : moment().add(2, 'days').format('MM/DD/YYYY');
+      let lastDate = moment(lastDateStr, 'MM/DD/YYYY');
+      while (dates.length < 7) {
+        lastDate = getNextWeekday(lastDate.clone().add(1, 'day'));
+        const newDateStr = lastDate.format('MM/DD/YYYY');
+        if (!fullyBookedDates.includes(newDateStr)) {
+          dates.push(newDateStr);
+        }
       }
+      console.log('Final valid dates:', dates);
+      setValidDates(dates);
+    } catch (error) {
+      console.error('Error updating valid dates:', error);
     }
-    setValidDates(dates);
   }
 
-  // Fetch available dates on component mount and update after a booking.
   useEffect(() => {
     updateValidDates();
   }, []);
@@ -93,8 +87,6 @@ function App() {
 
     try {
       const recaptchaToken = await executeRecaptcha('submit_form');
-      console.log('Generated reCAPTCHA Token:', recaptchaToken);
-
       const formData = {
         firstName,
         lastName,
@@ -107,23 +99,17 @@ function App() {
         recaptchaToken,
       };
 
-      console.log('Form Data Sent to Backend:', formData);
-
       const response = await axios.post(
         'https://ai-schedular-backend.onrender.com/api/intro-to-ai-payment',
         formData,
         {
           withCredentials: true,
-          headers: {
-            'Content-Type': 'application/json'
-          }
+          headers: { 'Content-Type': 'application/json' },
         }
       );
 
-      console.log('Form submission response:', response.data);
       alert('Form submitted successfully!');
-      
-      // After successful booking, refresh available dates.
+      // Refresh the available dates after booking
       updateValidDates();
     } catch (error) {
       console.error('Error during form submission:', error);
