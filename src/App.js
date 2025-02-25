@@ -15,29 +15,54 @@ function App() {
   const [termsChecked, setTermsChecked] = useState(false);
   const [validDates, setValidDates] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const { executeRecaptcha } = useGoogleReCaptcha(); // Use reCAPTCHA hook
+  const { executeRecaptcha } = useGoogleReCaptcha();
 
-  // Generate valid program dates
+  // Generate 7 initial valid dates (weekdays only) starting from today+2 days
   function getNextValidProgramDates() {
     const today = moment();
-    const validDates = [];
+    const dates = [];
     let nextValidDate = today.add(2, 'days');
 
     for (let i = 0; i < 7; i++) {
-      while (nextValidDate.isoWeekday() > 4) {
+      // Skip weekends (Saturday = 6, Sunday = 7)
+      while (nextValidDate.isoWeekday() > 5) {
         nextValidDate = nextValidDate.add(1, 'day');
       }
-      validDates.push(nextValidDate.format('MM/DD/YYYY'));
+      dates.push(nextValidDate.format('MM/DD/YYYY'));
       nextValidDate = nextValidDate.add(1, 'day');
     }
-
-    return validDates;
+    return dates;
   }
 
   useEffect(() => {
-    const dates = getNextValidProgramDates();
-    setValidDates(dates);
+    setValidDates(getNextValidProgramDates());
   }, []);
+
+  // If both class dates are the same, block out that day and add a new future date
+  useEffect(() => {
+    if (classDate && classDate2 && classDate === classDate2) {
+      setValidDates(prevDates => {
+        if (prevDates.includes(classDate)) {
+          // Remove the booked day from the list
+          const updatedDates = prevDates.filter(date => date !== classDate);
+          // Determine a new valid date based on the last date in the list
+          const lastDateStr = prevDates[prevDates.length - 1];
+          let newDate = moment(lastDateStr, 'MM/DD/YYYY').add(1, 'day');
+          while (newDate.isoWeekday() > 5) {
+            newDate = newDate.add(1, 'day');
+          }
+          updatedDates.push(newDate.format('MM/DD/YYYY'));
+          return updatedDates;
+        }
+        return prevDates;
+      });
+      // Clear the second selection so the user must choose a new date
+      setClassDate2('');
+      alert(
+        'The selected day is fully booked and has been replaced with a new available date. Please choose a different date for Class Date 2.'
+      );
+    }
+  }, [classDate, classDate2]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -50,7 +75,7 @@ function App() {
     }
 
     try {
-      const recaptchaToken = await executeRecaptcha('submit_form'); // Generate reCAPTCHA token
+      const recaptchaToken = await executeRecaptcha('submit_form');
       console.log('Generated reCAPTCHA Token:', recaptchaToken);
 
       const formData = {
@@ -62,7 +87,7 @@ function App() {
         time2,
         classDate,
         classDate2,
-        recaptchaToken, // Include the token in form data
+        recaptchaToken,
       };
 
       console.log('Form Data Sent to Backend:', formData);
@@ -71,10 +96,10 @@ function App() {
         'https://ai-schedular-backend.onrender.com/api/intro-to-ai-payment',
         formData,
         {
-          withCredentials: true, //  <-- Important for sending credentials
+          withCredentials: true,
           headers: {
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/json',
+          },
         }
       );
 
@@ -173,8 +198,8 @@ function App() {
                   required
                 >
                   <option value="">Select a time</option>
+                  <option value="9am-12pm EST/8am-11pm CST">9am-12pm EST</option>
                   <option value="2pm-5pm EST/1pm-4pm CST">2pm-5pm EST</option>
-                  <option value="6pm-9pm EST/5pm-8pm CST">6pm-9pm EST</option>
                 </select>
               </div>
               <div className="col-md-6">
@@ -204,8 +229,8 @@ function App() {
                   required
                 >
                   <option value="">Select a time</option>
+                  <option value="9am-12pm EST/8am-11pm CST">9am-12pm EST</option>
                   <option value="2pm-5pm EST/1pm-4pm CST">2pm-5pm EST</option>
-                  <option value="6pm-9pm EST/5pm-8pm CST">6pm-9pm EST</option>
                 </select>
               </div>
 
