@@ -206,7 +206,7 @@ function App() {
                   <option value="">Select a time</option>
                   <option value="9am-12pm EST/8am-11pm CST">9am-12pm EST</option>
                   <option value="2pm-5pm EST/1pm-4pm CST">2pm-5pm EST</option>
-                  <option value="10pm-5pm EST/9am-12pm CST">10am-5pm EST(Friday only)</option>
+                  <option value="10am-1pm EST/9am-12pm CST">10am-1pm EST(Friday only)</option>
                 </select>
               </div>
               <div className="col-md-6">
@@ -238,7 +238,7 @@ function App() {
                   <option value="">Select a time</option>
                   <option value="9am-12pm EST/8am-11pm CST">9am-12pm EST</option>
                   <option value="2pm-5pm EST/1pm-4pm CST">2pm-5pm EST</option>
-                  <option value="10pm-5pm EST/9am-12pm CST">10am-5pm EST(Friday only)</option>
+                  <option value="10am-1pm EST/9am-12pm CST">10am-1pm EST(Friday only)</option>
                 </select>
               </div>
 
