@@ -171,7 +171,7 @@ function App() {
                 />
               </div>
 
-              <div className="col-6">
+              <div className="col-12">
                 <label htmlFor="inputEmail" className="form-label">Email</label>
                 <input
                   type="email"
