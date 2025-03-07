@@ -171,17 +171,6 @@ function App() {
                 />
               </div>
 
-              <div className="col-12">
-                <label htmlFor="inputEmail" className="form-label">Email</label>
-                <input
-                  type="email"
-                  className="form-control"
-                  id="inputEmail"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
 
               <div className="col-6">
                 <label htmlFor="inputCompany" className="form-label">Company Name</label>
@@ -203,6 +192,17 @@ function App() {
                   id="inputPhone"
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="col-12">
+                <label htmlFor="inputEmail" className="form-label">Email</label>
+                <input
+                  type="email"
+                  className="form-control"
+                  id="inputEmail"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                 />
               </div>
