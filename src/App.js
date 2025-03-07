@@ -18,6 +18,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const { executeRecaptcha } = useGoogleReCaptcha();
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   // Utility: Get next weekday (Monday-Friday) from a given moment date.
   function getNextWeekday(date) {
@@ -80,6 +81,7 @@ function App() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setErrorMessage(""); // Reset error message before checking
 
     if (!executeRecaptcha) {
       alert('reCAPTCHA is not initialized');
@@ -88,6 +90,23 @@ function App() {
     }
 
     try {
+
+      // ✅ Step 1: Check if the selected date & time are available in MongoDB
+      const availabilityResponse = await axios.post(
+        "https://ai-schedular-backend.onrender.com/api/check-availability",
+        {
+          classDate,
+          time
+        }
+      );
+
+      if (!availabilityResponse.data.available) {
+        // ❌ Date & time are already taken, show an error message
+        setErrorMessage("The selected date and time are already booked. Please choose another.");
+        setIsLoading(false);
+        return;
+      }
+
       const recaptchaToken = await executeRecaptcha('submit_form');
       const formData = {
         firstName,
@@ -125,24 +144,24 @@ function App() {
 
   return (
     <GoogleReCaptchaProvider reCaptchaKey={process.env.REACT_APP_SITE_KEY}>
-        {isLoading ? (
-            <div className="loading-screen" style={{ textAlign: 'center', padding: '50px' }}>
-                <p>Loading, please wait...</p>
-            </div>
-        ) : isSubmitted ? (
-            // ✅ Full black screen on submission
-            <div style={{
-                width: "100vw",
-                height: "100vh",
-                backgroundColor: "black",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                color: "white",
-                fontSize: "24px"
-            }}>
-                Thank you! Redirecting...
-            </div>
+      {isLoading ? (
+        <div className="loading-screen" style={{ textAlign: 'center', padding: '50px' }}>
+          <p>Loading, please wait...</p>
+        </div>
+      ) : isSubmitted ? (
+        // ✅ Full black screen on submission
+        <div style={{
+          width: "100vw",
+          height: "100vh",
+          backgroundColor: "black",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          color: "white",
+          fontSize: "24px"
+        }}>
+          Thank you! Redirecting...
+        </div>
       ) : (
         <div className="App py-3" id="my-react-form">
           <div className="container">
@@ -283,7 +302,7 @@ function App() {
                     required
                   />
                   <label className="form-check-label" htmlFor="gridCheck">
-                    By providing your contact information and checking the box, you agree that Kable Academy may contact you about our relevant content, products, and services via email, phone and SMS communications. SMS can be used for reminders. SMS can be used for updates. View our 
+                    By providing your contact information and checking the box, you agree that Kable Academy may contact you about our relevant content, products, and services via email, phone and SMS communications. SMS can be used for reminders. SMS can be used for updates. View our
                     <a href='https://kableacademy.com/private-policy/'> Privacy Policy.</a>
                   </label>
                 </div>
