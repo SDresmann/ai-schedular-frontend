@@ -46,21 +46,21 @@ function App() {
   // Fetch fully booked dates and update valid dates accordingly.
   async function updateValidDates() {
     try {
-        const response = await axios.get("https://ai-schedular-backend.onrender.com/api/booked-dates");
-        const fullyBookedDates = response.data;
+      const response = await axios.get("https://ai-schedular-backend.onrender.com/api/booked-dates");
+      const fullyBookedDates = response.data;
 
-        console.log("✅ Received booked dates from backend:", fullyBookedDates); // 🚀 Debugging Log
+      console.log("✅ Received booked dates from backend:", fullyBookedDates); // 🚀 Debugging Log
 
-        let dates = getInitialValidDates();
-        dates = dates.filter(date => !(fullyBookedDates[date] && fullyBookedDates[date].length >= timeSlots.length)); 
+      let dates = getInitialValidDates();
+      dates = dates.filter(date => !(fullyBookedDates[date] && fullyBookedDates[date].length >= timeSlots.length));
 
-        setValidDates(dates);
-        setBookedDates(fullyBookedDates); // ✅ Update booked dates
+      setValidDates(dates);
+      setBookedDates(fullyBookedDates); // ✅ Update booked dates
 
     } catch (error) {
-        console.error("❌ Error updating valid dates:", error);
+      console.error("❌ Error updating valid dates:", error);
     }
-}
+  }
 
 
   useEffect(() => {
@@ -250,18 +250,27 @@ function App() {
               </div>
 
               <div className="col-md-6">
-                <label htmlFor="inputDate" className="form-label">Class Date 2</label>
+                <label htmlFor="inputDate2" className="form-label">Class Date 2</label>
+
+                {/* 🚀 Debugging Log */}
+                {console.log("🔍 Valid Dates:", validDates)}
+                {console.log("🔍 Booked Dates State:", bookedDates)}
+
                 <select
                   className="form-select form-select mb-3"
-                  id="inputDate"
+                  id="inputDate2"
                   value={classDate2}
                   onChange={(e) => setClassDate2(e.target.value)}
                   required
                 >
                   <option value="">Please select a date</option>
                   {validDates.map((date, index) => (
-                    <option key={index} value={moment(date).format('MM/DD/YYYY')}>
-                      {moment(date).format('MM/DD/YYYY')}
+                    <option
+                      key={index}
+                      value={moment(date).format("MM/DD/YYYY")}
+                      disabled={bookedDates[date] && bookedDates[date].length >= timeSlots.length}
+                    >
+                      {moment(date).format("MM/DD/YYYY")}
                     </option>
                   ))}
                 </select>
