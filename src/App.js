@@ -156,7 +156,7 @@ function App() {
         <div className="App py-3" id="my-react-form">
           <div className="container">
             <form className="row g-3" onSubmit={handleSubmit}>
-              <div className="col-md-6">
+              <div className="col-6">
                 <label htmlFor="inputName" className="form-label">First Name</label>
                 <input
                   type="text"
@@ -168,7 +168,7 @@ function App() {
                 />
               </div>
 
-              <div className="col-md-6">
+              <div className="col-6">
                 <label htmlFor="inputLast" className="form-label">Last Name</label>
                 <input
                   type="text"
