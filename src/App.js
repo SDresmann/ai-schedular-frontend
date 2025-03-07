@@ -7,6 +7,7 @@ function App() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
+  const [company, setCompany] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [time, setTime] = useState('');
   const [time2, setTime2] = useState('');
@@ -92,6 +93,7 @@ function App() {
         firstName,
         lastName,
         email,
+        company,
         phoneNumber,
         time,
         time2,
@@ -177,6 +179,18 @@ function App() {
                   id="inputEmail"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="col-6">
+                <label htmlFor="inputCompany" className="form-label">Company Name</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="inputCompnay"
+                  value={company}
+                  onChange={(e) => setCompany(e.target.value)}
                   required
                 />
               </div>
