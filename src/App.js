@@ -16,6 +16,7 @@ function App() {
   const [validDates, setValidDates] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const { executeRecaptcha } = useGoogleReCaptcha();
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   // Utility: Get next weekday (Monday-Friday) from a given moment date.
   function getNextWeekday(date) {
