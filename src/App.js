@@ -86,6 +86,7 @@ function App() {
         return;
     }
 
+    // 🚨 Prevent submission if both classDate & time are the same for both slots
     if (classDate === classDate2 && time === time2) {
         setErrorMessage(`❌ You selected the same date (${classDate}) and time (${time}) for both slots. Please choose a different one.`);
         setIsLoading(false);
@@ -93,33 +94,29 @@ function App() {
     }
 
     try {
+        // ✅ Step 1: Check availability for both date/time selections
         const [availabilityResponse1, availabilityResponse2] = await Promise.all([
             axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", { classDate, time }),
             axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", { classDate: classDate2, time: time2 })
         ]);
 
-        console.log("🔍 Availability Response 1:", availabilityResponse1.data);
-        console.log("🔍 Availability Response 2:", availabilityResponse2.data);
-
         let errorMessages = [];
 
+        // ✅ If the selected date/time is unavailable, show the user's selected values
         if (!availabilityResponse1.data.available) {
-            const bookedDate = availabilityResponse1.data.date ?? classDate;
-            const bookedTime = availabilityResponse1.data.time ?? time;
-            errorMessages.push(`❌ Date **${bookedDate}** and Time **${bookedTime}** are already booked.`);
+            errorMessages.push(`❌ Date **${classDate}** and Time **${time}** are already booked.`);
         }
         if (!availabilityResponse2.data.available) {
-            const bookedDate = availabilityResponse2.data.date ?? classDate2;
-            const bookedTime = availabilityResponse2.data.time ?? time2;
-            errorMessages.push(`❌ Date **${bookedDate}** and Time **${bookedTime}** are already booked.`);
+            errorMessages.push(`❌ Date **${classDate2}** and Time **${time2}** are already booked.`);
         }
 
         if (errorMessages.length > 0) {
-            setErrorMessage(errorMessages.join("\n"));
+            setErrorMessage(errorMessages.join("\n")); // 🔥 Shows multiple errors on new lines
             setIsLoading(false);
             return;
         }
 
+        // ✅ Step 2: Proceed with form submission if dates & times are available
         const recaptchaToken = await executeRecaptcha("submit_form");
         const formData = {
             firstName,
@@ -140,16 +137,15 @@ function App() {
         });
 
         updateValidDates();
+
+        // ✅ Redirect to thank-you page
         window.top.location.href = "https://ka.kableacademy.com/intro-to-ai-bulk-tech-cred-scheduler-thank-you";
 
     } catch (error) {
         console.error("❌ Error during form submission:", error);
 
-        if (error.response && error.response.data && error.response.data.message) {
-            setErrorMessage(`❌ ${error.response.data.message}`);
-        } else {
-            setErrorMessage("❌ An unexpected error occurred. Please try again.");
-        }
+        // Show a more detailed error if available
+        setErrorMessage("❌ An unexpected error occurred. Please try again.");
     } finally {
         setIsLoading(false);
     }
