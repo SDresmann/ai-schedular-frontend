@@ -46,23 +46,22 @@ function App() {
   // Fetch fully booked dates and update valid dates accordingly.
   async function updateValidDates() {
     try {
-      const response = await axios.get("https://ai-schedular-backend.onrender.com/api/booked-dates");
-      const fullyBookedDates = response.data; // Object containing booked dates & times
-      console.log("Fully booked dates:", fullyBookedDates);
+        const response = await axios.get("https://ai-schedular-backend.onrender.com/api/booked-dates");
+        const fullyBookedDates = response.data;
 
-      let dates = getInitialValidDates();
-      console.log("Initial valid dates:", dates);
+        console.log("✅ Received booked dates from backend:", fullyBookedDates); // 🚀 Debugging Log
 
-      // Filter out any dates that are fully booked
-      dates = dates.filter(date => !fullyBookedDates[date]);
-      console.log("Dates after filtering:", dates);
+        let dates = getInitialValidDates();
+        dates = dates.filter(date => !(fullyBookedDates[date] && fullyBookedDates[date].length >= timeSlots.length)); 
 
-      setValidDates(dates);
-      setBookedDates(fullyBookedDates); // Save booked times
+        setValidDates(dates);
+        setBookedDates(fullyBookedDates); // ✅ Update booked dates
+
     } catch (error) {
-      console.error("Error updating valid dates:", error);
+        console.error("❌ Error updating valid dates:", error);
     }
-  }
+}
+
 
   useEffect(() => {
     updateValidDates();
