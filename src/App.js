@@ -24,53 +24,41 @@ function App() {
   function getNextWeekday(date) {
     let nextDate = date.clone();
     while (nextDate.isoWeekday() > 5) { // 6 = Saturday, 7 = Sunday
-      nextDate.add(1, 'day');
+      nextDate.add(1, "day");
     }
     return nextDate;
   }
 
   // Generate an initial list of 7 valid dates (weekdays only) starting from today + 2 days.
   function getInitialValidDates() {
-    const startDate = moment().add(2, 'days');
+    const startDate = moment().add(2, "days");
     let nextValidDate = getNextWeekday(startDate);
     const dates = [];
     for (let i = 0; i < 7; i++) {
-      dates.push(nextValidDate.format('MM/DD/YYYY'));
-      nextValidDate = getNextWeekday(nextValidDate.clone().add(1, 'day'));
+      dates.push(nextValidDate.format("MM/DD/YYYY"));
+      nextValidDate = getNextWeekday(nextValidDate.clone().add(1, "day"));
     }
     return dates;
   }
 
-  // This function fetches fully booked dates from your backend and updates validDates accordingly.
+  // Fetch fully booked dates and update valid dates accordingly.
   async function updateValidDates() {
     try {
-      // Fetch fully booked dates from your backend endpoint
-      const response = await axios.get('https://ai-schedular-backend.onrender.com/api/booked-dates');
-      const fullyBookedDates = response.data; // Should be an array of dates in "MM/DD/YYYY"
-      console.log('Fully booked dates:', fullyBookedDates);
+      const response = await axios.get("https://ai-schedular-backend.onrender.com/api/booked-dates");
+      const fullyBookedDates = response.data; // Object containing booked dates & times
+      console.log("Fully booked dates:", fullyBookedDates);
 
-      // Get the initial list of dates
       let dates = getInitialValidDates();
-      console.log('Initial valid dates:', dates);
+      console.log("Initial valid dates:", dates);
 
       // Filter out any dates that are fully booked
-      dates = dates.filter(date => !fullyBookedDates.includes(date));
-      console.log('Dates after filtering:', dates);
+      dates = dates.filter(date => !fullyBookedDates[date]);
+      console.log("Dates after filtering:", dates);
 
-      // If we have fewer than 7 dates, append new dates until we have 7
-      let lastDateStr = dates.length ? dates[dates.length - 1] : moment().add(2, 'days').format('MM/DD/YYYY');
-      let lastDate = moment(lastDateStr, 'MM/DD/YYYY');
-      while (dates.length < 7) {
-        lastDate = getNextWeekday(lastDate.clone().add(1, 'day'));
-        const newDateStr = lastDate.format('MM/DD/YYYY');
-        if (!fullyBookedDates.includes(newDateStr)) {
-          dates.push(newDateStr);
-        }
-      }
-      console.log('Final valid dates:', dates);
       setValidDates(dates);
+      setBookedDates(fullyBookedDates); // Save booked times
     } catch (error) {
-      console.error('Error updating valid dates:', error);
+      console.error("Error updating valid dates:", error);
     }
   }
 
@@ -78,26 +66,34 @@ function App() {
     updateValidDates();
   }, []);
 
+  // List of available time slots
+  const timeSlots = ["9am-12pm EST", "2pm-5pm EST", "10am-1pm EST (Friday only)"];
+
+  // Get booked times for a selected date
+  const getDisabledTimes = (selectedDate) => {
+    return bookedDates[selectedDate] || [];
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setErrorMessage(""); // Reset error message before checking
+    setErrorMessage("");
 
     if (!executeRecaptcha) {
-      alert('reCAPTCHA is not initialized');
+      alert("reCAPTCHA is not initialized");
       setIsLoading(false);
       return;
     }
 
+    // Prevent submission if the user selects the same date & time for both slots
     if (classDate === classDate2 && time === time2) {
       setErrorMessage("You selected the same date and time for both slots. Please choose a different one.");
       setIsLoading(false);
       return;
-  }
+    }
 
     try {
-
-      const recaptchaToken = await executeRecaptcha('submit_form');
+      const recaptchaToken = await executeRecaptcha("submit_form");
       const formData = {
         firstName,
         lastName,
@@ -111,26 +107,27 @@ function App() {
         recaptchaToken,
       };
 
-      const response = await axios.post(
-        'https://ai-schedular-backend.onrender.com/api/intro-to-ai-payment',
-        formData,
-        {
-          withCredentials: true,
-          headers: { 'Content-Type': 'application/json' },
-        }
-      );
+      const response = await axios.post("https://ai-schedular-backend.onrender.com/api/intro-to-ai-payment", formData, {
+        withCredentials: true,
+        headers: { "Content-Type": "application/json" },
+      });
 
-      updateValidDates();
-
-      window.top.location.href = "https://ka.kableacademy.com/intro-to-ai-bulk-tech-cred-scheduler-thank-you";
+      if (response.status === 200) {
+        window.top.location.href = "https://ka.kableacademy.com/intro-to-ai-bulk-tech-cred-scheduler-thank-you";
+      }
 
     } catch (error) {
-      console.error('Error during form submission:', error);
-      alert('Error submitting form. Please try again.');
+      console.error("Error during form submission:", error);
+      if (error.response && error.response.status === 400) {
+        setErrorMessage(error.response.data.message);
+      } else {
+        setErrorMessage("An error occurred. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }
   };
+
 
   return (
     <GoogleReCaptchaProvider reCaptchaKey={process.env.REACT_APP_SITE_KEY}>
@@ -243,11 +240,14 @@ function App() {
                   required
                 >
                   <option value="">Select a time</option>
-                  <option value="9am-12pm EST/8am-11pm CST">9am-12pm EST</option>
-                  <option value="2pm-5pm EST/1pm-4pm CST">2pm-5pm EST</option>
-                  <option value="10am-1pm EST/9am-12pm CST">10am-1pm EST(Friday only)</option>
+                  {timeSlots.map((slot, index) => (
+                    <option key={index} value={slot} disabled={getDisabledTimes(classDate).includes(slot)}>
+                      {slot}
+                    </option>
+                  ))}
                 </select>
               </div>
+
               <div className="col-md-6">
                 <label htmlFor="inputDate" className="form-label">Class Date 2</label>
                 <select
@@ -266,20 +266,27 @@ function App() {
                 </select>
               </div>
               <div className="col-md-6">
-                <label htmlFor="inputTime" className="form-label">Program Time 2</label>
+                <label htmlFor="inputDate" className="form-label">Class Date 2</label>
                 <select
                   className="form-select form-select mb-3"
-                  id="inputTime"
-                  value={time2}
-                  onChange={(e) => setTime2(e.target.value)}
+                  id="inputDate"
+                  value={classDate2}
+                  onChange={(e) => setClassDate2(e.target.value)}
                   required
                 >
-                  <option value="">Select a time</option>
-                  <option value="9am-12pm EST/8am-11pm CST">9am-12pm EST</option>
-                  <option value="2pm-5pm EST/1pm-4pm CST">2pm-5pm EST</option>
-                  <option value="10am-1pm EST/9am-12pm CST">10am-1pm EST(Friday only)</option>
+                  <option value="">Please select a date</option>
+                  {validDates.map((date, index) => (
+                    <option
+                      key={index}
+                      value={moment(date).format("MM/DD/YYYY")}
+                      disabled={bookedDates[date] && bookedDates[date].length >= timeSlots.length} // Disable if all times are booked
+                    >
+                      {moment(date).format("MM/DD/YYYY")}
+                    </option>
+                  ))}
                 </select>
               </div>
+
 
               <div className="col-12">
                 <div className="form-check">
