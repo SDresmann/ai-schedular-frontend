@@ -89,22 +89,13 @@ function App() {
       return;
     }
 
-    try {
-      // ✅ Step 1: Check if the selected date & time are available before submitting
-      const availabilityResponse = await axios.post(
-          "https://ai-schedular-backend.onrender.com/api/check-availability",
-          {
-              classDate,
-              time
-          }
-      );
+    if (classDate === classDate2 && time === time2) {
+      setErrorMessage("You selected the same date and time for both slots. Please choose a different one.");
+      setIsLoading(false);
+      return;
+  }
 
-      if (!availabilityResponse.data.available) {
-          // ❌ Date & time already booked, show an error message
-          setErrorMessage("The selected date and time are already booked. Please choose another.");
-          setIsLoading(false);
-          return;
-      }
+    try {
 
       const recaptchaToken = await executeRecaptcha('submit_form');
       const formData = {
@@ -308,6 +299,11 @@ function App() {
               </div>
 
               <div className="col-12">
+                {errorMessage && (
+                  <div className="alert alert-danger" style={{ marginTop: "10px" }}>
+                    {errorMessage}
+                  </div>
+                )}
                 <button type="submit" className="btn">Submit</button>
               </div>
             </form>
