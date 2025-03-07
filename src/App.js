@@ -81,53 +81,77 @@ function App() {
     setErrorMessage("");
 
     if (!executeRecaptcha) {
-      alert("reCAPTCHA is not initialized");
-      setIsLoading(false);
-      return;
+        alert("reCAPTCHA is not initialized");
+        setIsLoading(false);
+        return;
     }
 
-    // Prevent submission if the user selects the same date & time for both slots
+    // 🚨 Prevent submission if both classDate & time are the same for both slots
     if (classDate === classDate2 && time === time2) {
-      setErrorMessage("You selected the same date and time for both slots. Please choose a different one.");
-      setIsLoading(false);
-      return;
+        setErrorMessage(`❌ You selected the same date (${classDate}) and time (${time}) for both slots. Please choose a different one.`);
+        setIsLoading(false);
+        return;
     }
 
     try {
-      const recaptchaToken = await executeRecaptcha("submit_form");
-      const formData = {
-        firstName,
-        lastName,
-        email,
-        company,
-        phoneNumber,
-        time,
-        time2,
-        classDate,
-        classDate2,
-        recaptchaToken,
-      };
+        // ✅ Step 1: Check availability for both date/time selections
+        const [availabilityResponse1, availabilityResponse2] = await Promise.all([
+            axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", { classDate, time }),
+            axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", { classDate: classDate2, time: time2 })
+        ]);
 
-      const response = await axios.post("https://ai-schedular-backend.onrender.com/api/intro-to-ai-payment", formData, {
-        withCredentials: true,
-        headers: { "Content-Type": "application/json" },
-      });
+        let errorMessages = [];
 
-      if (response.status === 200) {
+        if (!availabilityResponse1.data.available) {
+            errorMessages.push(`❌ Date ${classDate} and Time ${time} are already booked.`);
+        }
+        if (!availabilityResponse2.data.available) {
+            errorMessages.push(`❌ Date ${classDate2} and Time ${time2} are already booked.`);
+        }
+
+        if (errorMessages.length > 0) {
+            setErrorMessage(errorMessages.join(" "));
+            setIsLoading(false);
+            return;
+        }
+
+        // ✅ Step 2: Proceed with form submission if dates & times are available
+        const recaptchaToken = await executeRecaptcha("submit_form");
+        const formData = {
+            firstName,
+            lastName,
+            email,
+            company,
+            phoneNumber,
+            time,
+            time2,
+            classDate,
+            classDate2,
+            recaptchaToken,
+        };
+
+        const response = await axios.post(
+            "https://ai-schedular-backend.onrender.com/api/intro-to-ai-payment",
+            formData,
+            {
+                withCredentials: true,
+                headers: { "Content-Type": "application/json" },
+            }
+        );
+
+        updateValidDates();
+
+        // ✅ Redirect to thank-you page
         window.top.location.href = "https://ka.kableacademy.com/intro-to-ai-bulk-tech-cred-scheduler-thank-you";
-      }
 
     } catch (error) {
-      console.error("Error during form submission:", error);
-      if (error.response && error.response.status === 400) {
-        setErrorMessage(error.response.data.message);
-      } else {
-        setErrorMessage("An error occurred. Please try again.");
-      }
+        console.error("Error during form submission:", error);
+        setErrorMessage("❌ An error occurred. Please try again.");
     } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
-  };
+};
+
 
 
   return (
