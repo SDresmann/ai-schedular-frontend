@@ -19,6 +19,8 @@ function App() {
   const { executeRecaptcha } = useGoogleReCaptcha();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [bookedDates, setBookedDates] = useState({});
+
 
   // Utility: Get next weekday (Monday-Friday) from a given moment date.
   function getNextWeekday(date) {
@@ -266,22 +268,21 @@ function App() {
                 </select>
               </div>
               <div className="col-md-6">
-                <label htmlFor="inputDate" className="form-label">Class Date 2</label>
+                <label htmlFor="inputTime2" className="form-label">Program Time 2</label>
                 <select
                   className="form-select form-select mb-3"
-                  id="inputDate"
-                  value={classDate2}
-                  onChange={(e) => setClassDate2(e.target.value)}
+                  id="inputTime2"
+                  value={time2}
+                  onChange={(e) => {
+                    console.log("Selected Time 2:", e.target.value); // ✅ Debugging
+                    setTime2(e.target.value);
+                  }}
                   required
                 >
-                  <option value="">Please select a date</option>
-                  {validDates.map((date, index) => (
-                    <option
-                      key={index}
-                      value={moment(date).format("MM/DD/YYYY")}
-                      disabled={bookedDates[date] && bookedDates[date].length >= timeSlots.length} // Disable if all times are booked
-                    >
-                      {moment(date).format("MM/DD/YYYY")}
+                  <option value="">Select a time</option>
+                  {timeSlots.map((slot, index) => (
+                    <option key={index} value={slot} disabled={getDisabledTimes(classDate2).includes(slot)}>
+                      {slot}
                     </option>
                   ))}
                 </select>
