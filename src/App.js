@@ -108,9 +108,10 @@ function App() {
         }
       );
 
-      alert('Form submitted successfully!');
-      // Refresh the available dates after booking
       updateValidDates();
+
+      window.location.href = "https://ka.kableacademy.com/intro-to-ai-bulk-tech-cred-scheduler-thank-you";
+
     } catch (error) {
       console.error('Error during form submission:', error);
       alert('Error submitting form. Please try again.');
@@ -121,10 +122,24 @@ function App() {
 
   return (
     <GoogleReCaptchaProvider reCaptchaKey={process.env.REACT_APP_SITE_KEY}>
-      {isLoading ? (
-        <div className="loading-screen" style={{ textAlign: 'center', padding: '50px' }}>
-          <p>Loading, please wait...</p>
-        </div>
+        {isLoading ? (
+            <div className="loading-screen" style={{ textAlign: 'center', padding: '50px' }}>
+                <p>Loading, please wait...</p>
+            </div>
+        ) : isSubmitted ? (
+            // ✅ Full black screen on submission
+            <div style={{
+                width: "100vw",
+                height: "100vh",
+                backgroundColor: "black",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                color: "white",
+                fontSize: "24px"
+            }}>
+                Thank you! Redirecting...
+            </div>
       ) : (
         <div className="App py-3" id="my-react-form">
           <div className="container">
