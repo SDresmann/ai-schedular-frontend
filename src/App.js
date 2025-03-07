@@ -90,21 +90,20 @@ function App() {
     }
 
     try {
-
-      // ✅ Step 1: Check if the selected date & time are available in MongoDB
+      // ✅ Step 1: Check if the selected date & time are available before submitting
       const availabilityResponse = await axios.post(
-        "https://ai-schedular-backend.onrender.com/api/check-availability",
-        {
-          classDate,
-          time
-        }
+          "https://ai-schedular-backend.onrender.com/api/check-availability",
+          {
+              classDate,
+              time
+          }
       );
 
       if (!availabilityResponse.data.available) {
-        // ❌ Date & time are already taken, show an error message
-        setErrorMessage("The selected date and time are already booked. Please choose another.");
-        setIsLoading(false);
-        return;
+          // ❌ Date & time already booked, show an error message
+          setErrorMessage("The selected date and time are already booked. Please choose another.");
+          setIsLoading(false);
+          return;
       }
 
       const recaptchaToken = await executeRecaptcha('submit_form');
