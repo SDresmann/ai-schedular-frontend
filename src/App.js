@@ -231,7 +231,7 @@ useEffect(() => {
       updateValidDates();
 
       // ✅ Redirect to thank-you page
-      window.top.location.href = "https://ka.kableacademy.com/techcred-registration-thank-you";
+      window.top.location.href = "https://ka.kableacademy.com/techcred-registration-thank-you ";
 
     } catch (error) {
       console.error("Error during form submission:", error);
@@ -251,16 +251,19 @@ useEffect(() => {
         <div className="loading-screen" style={{ textAlign: 'center', padding: '50px' }}>
           <p>Loading, please wait...</p>
         </div>
-      ) : datesLoading ? (
+      ) : isSubmitted ? (
+        // ✅ Full black screen on submission
         <div style={{
+          width: "100vw",
+          height: "100vh",
+          backgroundColor: "black",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          height: "100vh",
-          fontSize: "20px",
-          fontWeight: "bold"
+          color: "white",
+          fontSize: "24px"
         }}>
-          ⏳ Loading available dates...
+          Thank you! Redirecting...
         </div>
       ) : (
         <div className="App py-3" id="my-react-form">
