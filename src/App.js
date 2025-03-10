@@ -20,6 +20,7 @@ function App() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [bookedDates, setBookedDates] = useState({});
+  const [datesLoading, setDatesLoading] = useState(true);
 
 
   // Utility: Get next weekday (Monday-Friday) from a given moment date.
@@ -130,9 +131,11 @@ async function updateValidDates() {
 
         setValidDates([...dates]); // ✅ Ensure React re-renders
         setBookedDates({...fullyBookedDates}); // ✅ Store booked dates properly
+        setDatesLoading(false); // ✅ Stop loading when done
 
     } catch (error) {
         console.error("❌ Error updating valid dates:", error);
+        setDatesLoading(false); // Stop loading even if there's an error
     }
 }
 
@@ -248,19 +251,16 @@ useEffect(() => {
         <div className="loading-screen" style={{ textAlign: 'center', padding: '50px' }}>
           <p>Loading, please wait...</p>
         </div>
-      ) : isSubmitted ? (
-        // ✅ Full black screen on submission
+      ) : datesLoading ? (
         <div style={{
-          width: "100vw",
-          height: "100vh",
-          backgroundColor: "black",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          color: "white",
-          fontSize: "24px"
+          height: "100vh",
+          fontSize: "20px",
+          fontWeight: "bold"
         }}>
-          Thank you! Redirecting...
+          ⏳ Loading available dates...
         </div>
       ) : (
         <div className="App py-3" id="my-react-form">
