@@ -94,41 +94,41 @@ function App() {
   // Fetch fully booked dates and update valid dates accordingly.
   async function updateValidDates() {
     try {
-      const response = await axios.get("https://ai-schedular-backend.onrender.com/api/booked-dates");
-      const fullyBookedDates = response.data;
+        const response = await axios.get("https://ai-schedular-backend.onrender.com/api/booked-dates");
+        const fullyBookedDates = response.data; // Example: { "03/10/2025": ["9am-12pm EST", "2pm-5pm EST"] }
 
-      console.log("✅ Received booked dates from backend:", fullyBookedDates); // Debugging
+        console.log("✅ Received booked dates from backend:", fullyBookedDates); // Debugging
 
-      let dates = [];
-      let startDate = moment().add(2, "days"); // Start from 2 days ahead
+        let dates = [];
+        let startDate = moment().add(2, "days"); // Start from 2 days ahead
 
-      // Generate 7 valid dates, skipping fully booked ones
-      while (dates.length < 7) {
-        let formattedDate = startDate.format("MM/DD/YYYY");
+        while (dates.length < 7) {
+            let formattedDate = startDate.format("MM/DD/YYYY");
 
-        if (!(fullyBookedDates[formattedDate] && fullyBookedDates[formattedDate].length >= timeSlots.length)) {
-          dates.push(formattedDate);
+            // ❌ Skip fully booked dates (if all time slots are taken)
+            if (!(fullyBookedDates[formattedDate] && fullyBookedDates[formattedDate].length >= timeSlots.length)) {
+                dates.push(formattedDate);
+            }
+
+            // Move to the next weekday (Monday-Friday only)
+            startDate = getNextWeekday(startDate.clone().add(1, "day"));
         }
 
-        // Move to the next weekday (Monday-Friday only)
-        startDate = getNextWeekday(startDate.clone().add(1, "day"));
-      }
+        console.log("📌 Final valid dates list:", dates); // ✅ Debugging Log
 
-      setValidDates(dates);
-      setBookedDates(fullyBookedDates);
+        setValidDates([...dates]); // ✅ Ensure React re-renders
+        setBookedDates({...fullyBookedDates}); // ✅ Store booked dates properly
 
     } catch (error) {
-      console.error("❌ Error updating valid dates:", error);
+        console.error("❌ Error updating valid dates:", error);
     }
-  }
-
-
-
+}
 
   useEffect(() => {
+    console.log("🔄 Updating valid dates...");
     updateValidDates();
-    console.log("📌 Booked Dates State:", bookedDates);  // ✅ Debugging Log
-  }, []);
+}, []);
+
 
 
   // List of available time slots
