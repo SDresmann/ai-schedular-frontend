@@ -75,7 +75,7 @@ function App() {
 
   // Get booked times for a selected date
   const getDisabledTimes = (selectedDate) => {
-    return bookedDates[selectedDate] || [];
+    return bookedDates[selectedDate] ? bookedDates[selectedDate] : [];
   };
 
   const handleSubmit = async (e) => {
@@ -254,26 +254,26 @@ function App() {
                 >
                   <option value="">Please select a date</option>
                   {validDates.map((date, index) => (
-                    <option key={index} value={moment(date).format('MM/DD/YYYY')}>
-                      {moment(date).format('MM/DD/YYYY')}
+                    <option key={index} value={moment(date).format("MM/DD/YYYY")}
+                      disabled={bookedDates[date] && bookedDates[date].length >= timeSlots.length}>
+                      {moment(date).format("MM/DD/YYYY")}
                     </option>
                   ))}
                 </select>
               </div>
               <div className="col-md-6">
-                <label htmlFor="inputDate" className="form-label">Class Date 1</label>
+                <label htmlFor="inputTime" className="form-label">Program Time 1</label>
                 <select
                   className="form-select form-select mb-3"
-                  id="inputDate"
-                  value={classDate}
-                  onChange={(e) => setClassDate(e.target.value)}
+                  id="inputTime"
+                  value={time}
+                  onChange={(e) => setTime(e.target.value)}
                   required
                 >
-                  <option value="">Please select a date</option>
-                  {validDates.map((date, index) => (
-                    <option key={index} value={moment(date).format("MM/DD/YYYY")}
-                      disabled={bookedDates[date] && bookedDates[date].length >= timeSlots.length}>
-                      {moment(date).format("MM/DD/YYYY")}
+                  <option value="">Select a time</option>
+                  {timeSlots.map((slot, index) => (
+                    <option key={index} value={slot.value} disabled={getDisabledTimes(classDate).includes(slot.value)}>
+                      {slot.label}
                     </option>
                   ))}
                 </select>
@@ -307,17 +307,13 @@ function App() {
                   required
                 >
                   <option value="">Select a time</option>
-                  {timeSlots
-                    .filter(slot => !slot.isFridayOnly || moment(classDate2, "MM/DD/YYYY").isoWeekday() === 5)
-                    .map((slot, index) => (
-                      <option key={index} value={slot.value}>
-                        {slot.label}
-                      </option>
-                    ))}
+                  {timeSlots.map((slot, index) => (
+                    <option key={index} value={slot.value} disabled={getDisabledTimes(classDate2).includes(slot.value)}>
+                      {slot.label}
+                    </option>
+                  ))}
                 </select>
               </div>
-
-
               <div className="col-12">
                 <div className="form-check">
                   <input
