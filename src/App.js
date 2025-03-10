@@ -37,22 +37,31 @@ function App() {
       const response = await axios.get("https://ai-schedular-backend.onrender.com/api/booked-dates");
       const fullyBookedDates = response.data;
 
-      console.log("✅ Received booked dates from backend:", fullyBookedDates); // 🔍 Debugging Log
+      console.log("✅ Received booked dates from backend:", fullyBookedDates); // Debugging
 
-      let dates = getInitialValidDates();
+      let dates = [];
+      let startDate = moment().add(2, "days"); // Start from 2 days ahead
 
-      // 🚨 Remove fully booked dates from the valid list
-      dates = dates.filter(date => {
-        return !(fullyBookedDates[date] && fullyBookedDates[date].length >= timeSlots.length);
-      });
+      // Generate 7 valid dates, skipping fully booked ones
+      while (dates.length < 7) {
+        let formattedDate = startDate.format("MM/DD/YYYY");
+
+        if (!(fullyBookedDates[formattedDate] && fullyBookedDates[formattedDate].length >= timeSlots.length)) {
+          dates.push(formattedDate);
+        }
+
+        // Move to the next weekday (Monday-Friday only)
+        startDate = getNextWeekday(startDate.clone().add(1, "day"));
+      }
 
       setValidDates(dates);
-      setBookedDates(fullyBookedDates); // ✅ Store booked times per date
+      setBookedDates(fullyBookedDates);
 
     } catch (error) {
       console.error("❌ Error updating valid dates:", error);
     }
   }
+
 
 
 
@@ -285,38 +294,29 @@ function App() {
                 >
                   <option value="">Please select a date</option>
                   {validDates.map((date, index) => (
-                    <option key={index} value={moment(date).format("MM/DD/YYYY")}
-                      disabled={bookedDates[date] && bookedDates[date].length >= timeSlots.length}>
-                      {moment(date).format("MM/DD/YYYY")}
+                    <option key={index} value={date}>
+                      {date}
                     </option>
                   ))}
                 </select>
               </div>
               <div className="col-md-6">
-                <label htmlFor="inputDate" className="form-label">Class Date 1</label>
+                <label htmlFor="inputDate2" className="form-label">Class Date 2</label>
                 <select
                   className="form-select form-select mb-3"
-                  id="inputDate"
-                  value={classDate}
-                  onChange={(e) => setClassDate(e.target.value)}
+                  id="inputDate2"
+                  value={classDate2}
+                  onChange={(e) => setClassDate2(e.target.value)}
                   required
                 >
                   <option value="">Please select a date</option>
                   {validDates.map((date, index) => (
-                    <option
-                      key={index}
-                      value={moment(date).format("MM/DD/YYYY")}
-                      disabled={bookedDates[date] && bookedDates[date].length >= timeSlots.length}
-                    >
-                      {moment(date).format("MM/DD/YYYY")}
+                    <option key={index} value={date}>
+                      {date}
                     </option>
                   ))}
                 </select>
               </div>
-
-
-
-
               <div className="col-md-6">
                 <label htmlFor="inputDate2" className="form-label">Class Date 2</label>
                 <select
