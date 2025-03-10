@@ -231,7 +231,7 @@ useEffect(() => {
       updateValidDates();
 
       // ✅ Redirect to thank-you page
-      window.top.location.href = "https://ka.kableacademy.com/techcred-registration";
+      window.top.location.href = "https://ka.kableacademy.com/techcred-registration-thank-you";
 
     } catch (error) {
       console.error("Error during form submission:", error);
