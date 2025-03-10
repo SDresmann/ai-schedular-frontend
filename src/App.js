@@ -68,10 +68,16 @@ function App() {
 
   useEffect(() => {
     updateValidDates();
+    console.log("📌 Booked Dates State:", bookedDates);  // ✅ Debugging Log
   }, []);
 
+
   // List of available time slots
-  const timeSlots = ["9am-12pm EST", "2pm-5pm EST", "10am-1pm EST (Friday only)"];
+  const timeSlots = [
+    "9am-12pm EST/8am-11pm CST",
+    "2pm-5pm EST/1pm-4pm CST",
+    "10am-1pm EST/9am-12pm CST"
+  ];
 
   // Get booked times for a selected date
   const getDisabledTimes = (selectedDate) => {
@@ -272,12 +278,13 @@ function App() {
                 >
                   <option value="">Select a time</option>
                   {timeSlots.map((slot, index) => (
-                    <option key={index} value={slot.value} disabled={getDisabledTimes(classDate).includes(slot.value)}>
-                      {slot.label}
+                    <option key={index} value={slot} disabled={getDisabledTimes(classDate).includes(slot)}>
+                      {slot}
                     </option>
                   ))}
                 </select>
               </div>
+
 
               <div className="col-md-6">
                 <label htmlFor="inputDate2" className="form-label">Class Date 2</label>
@@ -308,12 +315,13 @@ function App() {
                 >
                   <option value="">Select a time</option>
                   {timeSlots.map((slot, index) => (
-                    <option key={index} value={slot.value} disabled={getDisabledTimes(classDate2).includes(slot.value)}>
-                      {slot.label}
+                    <option key={index} value={slot} disabled={getDisabledTimes(classDate2).includes(slot)}>
+                      {slot}
                     </option>
                   ))}
                 </select>
               </div>
+
               <div className="col-12">
                 <div className="form-check">
                   <input
