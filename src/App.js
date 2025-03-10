@@ -37,31 +37,22 @@ function App() {
       const response = await axios.get("https://ai-schedular-backend.onrender.com/api/booked-dates");
       const fullyBookedDates = response.data;
 
-      console.log("✅ Received booked dates from backend:", fullyBookedDates); // Debugging
+      console.log("✅ Received booked dates from backend:", fullyBookedDates); // 🔍 Debugging Log
 
-      let dates = [];
-      let startDate = moment().add(2, "days"); // Start from 2 days ahead
+      let dates = getInitialValidDates();
 
-      // Generate 7 valid dates, skipping fully booked ones
-      while (dates.length < 7) {
-        let formattedDate = startDate.format("MM/DD/YYYY");
-
-        if (!(fullyBookedDates[formattedDate] && fullyBookedDates[formattedDate].length >= timeSlots.length)) {
-          dates.push(formattedDate);
-        }
-
-        // Move to the next weekday (Monday-Friday only)
-        startDate = getNextWeekday(startDate.clone().add(1, "day"));
-      }
+      // 🚨 Remove fully booked dates from the valid list
+      dates = dates.filter(date => {
+        return !(fullyBookedDates[date] && fullyBookedDates[date].length >= timeSlots.length);
+      });
 
       setValidDates(dates);
-      setBookedDates(fullyBookedDates);
+      setBookedDates(fullyBookedDates); // ✅ Store booked times per date
 
     } catch (error) {
       console.error("❌ Error updating valid dates:", error);
     }
   }
-
 
 
 
@@ -80,23 +71,34 @@ function App() {
   // Fetch fully booked dates and update valid dates accordingly.
   async function updateValidDates() {
     try {
-      const response = await axios.get("https://ai-schedular-backend.onrender.com/api/booked-dates");
-      const fullyBookedDates = response.data; // Expected format: { "MM/DD/YYYY": ["9am-12pm EST", "2pm-5pm EST"] }
+        const response = await axios.get("https://ai-schedular-backend.onrender.com/api/booked-dates");
+        const fullyBookedDates = response.data;
 
-      console.log("✅ Received booked dates from backend:", fullyBookedDates);
+        console.log("✅ Received booked dates from backend:", fullyBookedDates); // Debugging
 
-      let dates = getInitialValidDates();
+        let dates = [];
+        let startDate = moment().add(2, "days"); // Start from 2 days ahead
 
-      // Ensure only FULLY booked dates are removed (all time slots taken)
-      dates = dates.filter(date => !(fullyBookedDates[date] && fullyBookedDates[date].length >= timeSlots.length));
+        // Generate 7 valid dates, skipping fully booked ones
+        while (dates.length < 7) {
+            let formattedDate = startDate.format("MM/DD/YYYY");
 
-      setValidDates(dates);
-      setBookedDates(fullyBookedDates); // ✅ Store booked dates & times
+            if (!(fullyBookedDates[formattedDate] && fullyBookedDates[formattedDate].length >= timeSlots.length)) {
+                dates.push(formattedDate);
+            }
+
+            // Move to the next weekday (Monday-Friday only)
+            startDate = getNextWeekday(startDate.clone().add(1, "day"));
+        }
+
+        setValidDates(dates);
+        setBookedDates(fullyBookedDates);
 
     } catch (error) {
-      console.error("❌ Error updating valid dates:", error);
+        console.error("❌ Error updating valid dates:", error);
     }
-  }
+}
+
 
 
 
@@ -300,6 +302,27 @@ function App() {
                   ))}
                 </select>
               </div>
+
+              <div className="col-md-6">
+                <label htmlFor="inputTime" className="form-label">Program Time 1</label>
+                <select
+                  className="form-select form-select mb-3"
+                  id="inputTime"
+                  value={time}
+                  onChange={(e) => setTime(e.target.value)}
+                  required
+                >
+                  <option value="">Select a time</option>
+                  {getAvailableTimeSlots(classDate).map((slot, index) => (
+                    <option key={index} value={slot} disabled={getDisabledTimes(classDate).includes(slot)}>
+                      {slot}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+
+
               <div className="col-md-6">
                 <label htmlFor="inputDate2" className="form-label">Class Date 2</label>
                 <select
@@ -317,46 +340,24 @@ function App() {
                   ))}
                 </select>
               </div>
-              <div className="col-md-6">
-                <label htmlFor="inputDate2" className="form-label">Class Date 2</label>
-                <select
-                  className="form-select form-select mb-3"
-                  id="inputDate2"
-                  value={classDate2}
-                  onChange={(e) => setClassDate2(e.target.value)}
-                  required
-                >
-                  <option value="">Please select a date</option>
-                  {validDates.map((date, index) => (
-                    <option key={index} value={moment(date).format("MM/DD/YYYY")}
-                      disabled={bookedDates[date] && bookedDates[date].length >= timeSlots.length}>
-                      {moment(date).format("MM/DD/YYYY")}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="col-md-6">
-                <label htmlFor="inputDate2" className="form-label">Class Date 2</label>
-                <select
-                  className="form-select form-select mb-3"
-                  id="inputDate2"
-                  value={classDate2}
-                  onChange={(e) => setClassDate2(e.target.value)}
-                  required
-                >
-                  <option value="">Please select a date</option>
-                  {validDates.map((date, index) => (
-                    <option
-                      key={index}
-                      value={moment(date).format("MM/DD/YYYY")}
-                      disabled={bookedDates[date] && bookedDates[date].length >= timeSlots.length}
-                    >
-                      {moment(date).format("MM/DD/YYYY")}
-                    </option>
-                  ))}
-                </select>
-              </div>
 
+              <div className="col-md-6">
+                <label htmlFor="inputTime2" className="form-label">Program Time 2</label>
+                <select
+                  className="form-select form-select mb-3"
+                  id="inputTime2"
+                  value={time2}
+                  onChange={(e) => setTime2(e.target.value)}
+                  required
+                >
+                  <option value="">Select a time</option>
+                  {getAvailableTimeSlots(classDate2).map((slot, index) => (
+                    <option key={index} value={slot} disabled={getDisabledTimes(classDate2).includes(slot)}>
+                      {slot}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
 
               <div className="col-12">
