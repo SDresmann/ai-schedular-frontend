@@ -218,7 +218,7 @@ function App() {
       updateValidDates();
 
       // ✅ Redirect to thank-you page
-      window.top.location.href = "https://ka.kableacademy.com/intro-to-ai-bulk-tech-cred-scheduler-thank-you";
+      window.top.location.href = "https://ka.kableacademy.com/techcred-registration";
 
     } catch (error) {
       console.error("Error during form submission:", error);
