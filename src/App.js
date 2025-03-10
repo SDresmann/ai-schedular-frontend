@@ -81,6 +81,10 @@ async function updateValidDates() {
     console.error("❌ Error updating valid dates:", error);
   }
 }
+
+
+
+
   // Generate an initial list of 7 valid dates (weekdays only) starting from today + 2 days.
   function getInitialValidDates() {
     const startDate = moment().add(2, "days");
@@ -132,6 +136,7 @@ async function updateValidDates() {
     }
 }
 
+
 useEffect(() => {
   // Set placeholder dates while fetching from backend
   const placeholderDates = getInitialValidDates();
@@ -140,6 +145,9 @@ useEffect(() => {
   // Fetch actual booked dates from the backend
   updateValidDates();
 }, []);
+
+
+
 
   // List of available time slots
   const timeSlots = [
