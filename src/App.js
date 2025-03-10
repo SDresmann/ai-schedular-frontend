@@ -344,13 +344,21 @@ function App() {
               </div>
 
               <div className="col-12">
-                {errorMessage && (
-                  <div className="alert alert-danger" style={{ marginTop: "10px", whiteSpace: "pre-line" }}>
-                    {errorMessage}
-                  </div>
-                )}
-                <button type="submit" className="btn">Submit</button>
-              </div>
+    {errorMessage && (
+        <div className="alert alert-danger" style={{
+            marginTop: "10px", 
+            whiteSpace: "pre-line", 
+            fontWeight: "bold",
+            padding: "10px",
+            border: "2px solid red",
+            backgroundColor: "#ffe6e6",
+            color: "red"
+        }}>
+            {errorMessage}
+        </div>
+    )}
+    <button type="submit" className="btn">Submit</button>
+</div>
             </form>
           </div>
         </div>
