@@ -31,19 +31,18 @@ function App() {
     return nextDate;
   }
 
-const getAvailableTimeSlots = (selectedDate) => {
+  const getAvailableTimeSlots = (selectedDate) => {
     if (!selectedDate) return [];
 
     const isFriday = moment(selectedDate, "MM/DD/YYYY").isoWeekday() === 5; // 5 = Friday
-    const bookedTimes = bookedDates[selectedDate] || []; // Get booked time slots for selected date
 
     return timeSlots.filter(slot => {
-        if (slot === "10am-1pm EST/9am-12pm CST") {
-            return isFriday && !bookedTimes.includes(slot); // Only show on Fridays & if not booked
-        }
-        return !bookedTimes.includes(slot); // Remove booked time slots
+      if (slot === "10am-1pm EST/9am-12pm CST") {
+        return isFriday; // Only show this on Fridays
+      }
+      return true;
     });
-};
+  };
 
 
   async function updateValidDates() {
@@ -95,35 +94,36 @@ const getAvailableTimeSlots = (selectedDate) => {
   // Fetch fully booked dates and update valid dates accordingly.
   async function updateValidDates() {
     try {
-        const response = await axios.get("https://ai-schedular-backend.onrender.com/api/booked-dates");
-        const fullyBookedDates = response.data; // Example format: { "03/10/2025": ["9am-12pm EST", "2pm-5pm EST"] }
+      const response = await axios.get("https://ai-schedular-backend.onrender.com/api/booked-dates");
+      const fullyBookedDates = response.data;
 
-        console.log("✅ Received booked dates from backend:", fullyBookedDates); // Debugging
+      console.log("✅ Received booked dates from backend:", fullyBookedDates); // Debugging
 
-        let dates = [];
-        let startDate = moment().add(2, "days"); // Start from 2 days ahead
+      let dates = [];
+      let startDate = moment().add(2, "days"); // Start from 2 days ahead
 
-        // Generate 7 valid dates, skipping fully booked ones
-        while (dates.length < 7) {
-            let formattedDate = startDate.format("MM/DD/YYYY");
+      // Generate 7 valid dates, skipping fully booked ones
+      while (dates.length < 7) {
+        let formattedDate = startDate.format("MM/DD/YYYY");
 
-            // ❌ Skip fully booked dates (if all time slots are taken)
-            if (!(fullyBookedDates[formattedDate] && fullyBookedDates[formattedDate].length >= timeSlots.length)) {
-                dates.push(formattedDate);
-            }
-
-            // Move to the next weekday (Monday-Friday only)
-            startDate = getNextWeekday(startDate.clone().add(1, "day"));
+        if (!(fullyBookedDates[formattedDate] && fullyBookedDates[formattedDate].length >= timeSlots.length)) {
+          dates.push(formattedDate);
         }
 
-        setValidDates(dates);
-        setBookedDates(fullyBookedDates);
-        console.log("📌 Updated valid dates:", dates); // ✅ Debugging Log
+        // Move to the next weekday (Monday-Friday only)
+        startDate = getNextWeekday(startDate.clone().add(1, "day"));
+      }
+
+      setValidDates(dates);
+      setBookedDates(fullyBookedDates);
 
     } catch (error) {
-        console.error("❌ Error updating valid dates:", error);
+      console.error("❌ Error updating valid dates:", error);
     }
-}
+  }
+
+
+
 
   useEffect(() => {
     updateValidDates();
