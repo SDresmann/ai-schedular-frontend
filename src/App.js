@@ -81,80 +81,80 @@ function App() {
     setErrorMessage(""); // Reset previous errors
 
     if (!executeRecaptcha) {
-        alert("reCAPTCHA is not initialized");
-        setIsLoading(false);
-        return;
+      alert("reCAPTCHA is not initialized");
+      setIsLoading(false);
+      return;
     }
 
     // 🚨 Prevent submission if both classDate & time are the same for both slots
     if (classDate === classDate2 && time === time2) {
-        setErrorMessage(`❌ You selected the same date (${classDate}) and time (${time}) for both slots. Please choose a different one.`);
-        setIsLoading(false);
-        return;
+      setErrorMessage(`❌ You selected the same date (${classDate}) and time (${time}) for both slots. Please choose a different one.`);
+      setIsLoading(false);
+      return;
     }
 
     try {
-        // ✅ Step 1: Check availability for both date/time selections
-        const [availabilityResponse1, availabilityResponse2] = await Promise.all([
-            axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", { classDate, time }),
-            axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", { classDate: classDate2, time: time2 })
-        ]);
+      // ✅ Step 1: Check availability for both date/time selections
+      const [availabilityResponse1, availabilityResponse2] = await Promise.all([
+        axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", { classDate, time }),
+        axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", { classDate: classDate2, time: time2 })
+      ]);
 
-        let errorMessages = [];
+      let errorMessages = [];
 
-        // ✅ Display the exact unavailable date/time
-        if (!availabilityResponse1.data.available) {
-            errorMessages.push(availabilityResponse1.data.message);
-        }
-        if (!availabilityResponse2.data.available) {
-            errorMessages.push(availabilityResponse2.data.message);
-        }
+      // ✅ Display the exact unavailable date/time
+      if (!availabilityResponse1.data.available) {
+        errorMessages.push(availabilityResponse1.data.message);
+      }
+      if (!availabilityResponse2.data.available) {
+        errorMessages.push(availabilityResponse2.data.message);
+      }
 
-        if (errorMessages.length > 0) {
-            setErrorMessage(errorMessages.join("\n"));
-            setIsLoading(false);
-            return;
-        }
+      if (errorMessages.length > 0) {
+        setErrorMessage(errorMessages.join("\n"));
+        setIsLoading(false);
+        return;
+      }
 
-        // ✅ Step 2: Proceed with form submission if dates & times are available
-        const recaptchaToken = await executeRecaptcha("submit_form");
-        const formData = {
-            firstName,
-            lastName,
-            email,
-            company,
-            phoneNumber,
-            time,
-            time2,
-            classDate,
-            classDate2,
-            recaptchaToken,
-        };
+      // ✅ Step 2: Proceed with form submission if dates & times are available
+      const recaptchaToken = await executeRecaptcha("submit_form");
+      const formData = {
+        firstName,
+        lastName,
+        email,
+        company,
+        phoneNumber,
+        time,
+        time2,
+        classDate,
+        classDate2,
+        recaptchaToken,
+      };
 
-        await axios.post("https://ai-schedular-backend.onrender.com/api/intro-to-ai-payment", formData, {
-            withCredentials: true,
-            headers: { "Content-Type": "application/json" },
-        });
+      await axios.post("https://ai-schedular-backend.onrender.com/api/intro-to-ai-payment", formData, {
+        withCredentials: true,
+        headers: { "Content-Type": "application/json" },
+      });
 
-        updateValidDates();
+      updateValidDates();
 
-        // ✅ Redirect to thank-you page
-        window.top.location.href = "https://ka.kableacademy.com/intro-to-ai-bulk-tech-cred-scheduler-thank-you";
+      // ✅ Redirect to thank-you page
+      window.top.location.href = "https://ka.kableacademy.com/intro-to-ai-bulk-tech-cred-scheduler-thank-you";
 
     } catch (error) {
-        console.error("❌ Error during form submission:", error);
+      console.error("❌ Error during form submission:", error);
 
-        let errorText = "❌ An unexpected error occurred. Please try again.";
+      let errorText = "❌ An unexpected error occurred. Please try again.";
 
-        if (error.response && error.response.data && error.response.data.message) {
-            errorText = `❌ ${error.response.data.message}`;
-        }
+      if (error.response && error.response.data && error.response.data.message) {
+        errorText = `❌ ${error.response.data.message}`;
+      }
 
-        setErrorMessage(errorText);
+      setErrorMessage(errorText);
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
-};
+  };
 
 
 
@@ -270,11 +270,13 @@ function App() {
                   required
                 >
                   <option value="">Select a time</option>
-                  {timeSlots.map((slot, index) => (
-                    <option key={index} value={slot} disabled={getDisabledTimes(classDate).includes(slot)}>
-                      {slot}
-                    </option>
-                  ))}
+                  {timeSlots
+                    .filter(slot => !slot.isFridayOnly || moment(classDate, "MM/DD/YYYY").isoWeekday() === 5)
+                    .map((slot, index) => (
+                      <option key={index} value={slot.value}>
+                        {slot.label}
+                      </option>
+                    ))}
                 </select>
               </div>
 
@@ -310,18 +312,17 @@ function App() {
                   className="form-select form-select mb-3"
                   id="inputTime2"
                   value={time2}
-                  onChange={(e) => {
-                    console.log("Selected Time 2:", e.target.value); // ✅ Debugging
-                    setTime2(e.target.value);
-                  }}
+                  onChange={(e) => setTime2(e.target.value)}
                   required
                 >
                   <option value="">Select a time</option>
-                  {timeSlots.map((slot, index) => (
-                    <option key={index} value={slot} disabled={getDisabledTimes(classDate2).includes(slot)}>
-                      {slot}
-                    </option>
-                  ))}
+                  {timeSlots
+                    .filter(slot => !slot.isFridayOnly || moment(classDate2, "MM/DD/YYYY").isoWeekday() === 5)
+                    .map((slot, index) => (
+                      <option key={index} value={slot.value}>
+                        {slot.label}
+                      </option>
+                    ))}
                 </select>
               </div>
 
@@ -344,21 +345,21 @@ function App() {
               </div>
 
               <div className="col-12">
-    {errorMessage && (
-        <div className="alert alert-danger" style={{
-            marginTop: "10px", 
-            whiteSpace: "pre-line", 
-            fontWeight: "bold",
-            padding: "10px",
-            border: "2px solid red",
-            backgroundColor: "#ffe6e6",
-            color: "red"
-        }}>
-            {errorMessage}
-        </div>
-    )}
-    <button type="submit" className="btn">Submit</button>
-</div>
+                {errorMessage && (
+                  <div className="alert alert-danger" style={{
+                    marginTop: "10px",
+                    whiteSpace: "pre-line",
+                    fontWeight: "bold",
+                    padding: "10px",
+                    border: "2px solid red",
+                    backgroundColor: "#ffe6e6",
+                    color: "red"
+                  }}>
+                    {errorMessage}
+                  </div>
+                )}
+                <button type="submit" className="btn">Submit</button>
+              </div>
             </form>
           </div>
         </div>
