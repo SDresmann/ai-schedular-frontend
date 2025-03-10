@@ -102,16 +102,16 @@ function App() {
 
         let errorMessages = [];
 
-        // ✅ If the selected date/time is unavailable, show the user's selected values
+        // ✅ Display the exact unavailable date/time
         if (!availabilityResponse1.data.available) {
-            errorMessages.push(`❌ Date **${classDate}** and Time **${time}** are already booked.`);
+            errorMessages.push(availabilityResponse1.data.message);
         }
         if (!availabilityResponse2.data.available) {
-            errorMessages.push(`❌ Date **${classDate2}** and Time **${time2}** are already booked.`);
+            errorMessages.push(availabilityResponse2.data.message);
         }
 
         if (errorMessages.length > 0) {
-            setErrorMessage(errorMessages.join("\n")); // 🔥 Shows multiple errors on new lines
+            setErrorMessage(errorMessages.join("\n"));
             setIsLoading(false);
             return;
         }
@@ -144,12 +144,18 @@ function App() {
     } catch (error) {
         console.error("❌ Error during form submission:", error);
 
-        // Show a more detailed error if available
-        setErrorMessage("❌ An unexpected error occurred. Please try again.");
+        let errorText = "❌ An unexpected error occurred. Please try again.";
+
+        if (error.response && error.response.data && error.response.data.message) {
+            errorText = `❌ ${error.response.data.message}`;
+        }
+
+        setErrorMessage(errorText);
     } finally {
         setIsLoading(false);
     }
 };
+
 
 
 
