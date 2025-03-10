@@ -31,6 +31,21 @@ function App() {
     return nextDate;
   }
 
+
+  const getAvailableTimeSlots = (selectedDate) => {
+    if (!selectedDate) return [];
+
+    const isFriday = moment(selectedDate, "MM/DD/YYYY").isoWeekday() === 5; // 5 = Friday
+
+    return timeSlots.filter(slot => {
+      if (slot === "10am-1pm EST/9am-12pm CST") {
+        return isFriday; // Only show this on Fridays
+      }
+      return true;
+    });
+  };
+
+
   // Generate an initial list of 7 valid dates (weekdays only) starting from today + 2 days.
   function getInitialValidDates() {
     const startDate = moment().add(2, "days");
@@ -277,13 +292,14 @@ function App() {
                   required
                 >
                   <option value="">Select a time</option>
-                  {timeSlots.map((slot, index) => (
+                  {getAvailableTimeSlots(classDate).map((slot, index) => (
                     <option key={index} value={slot} disabled={getDisabledTimes(classDate).includes(slot)}>
                       {slot}
                     </option>
                   ))}
                 </select>
               </div>
+
 
 
               <div className="col-md-6">
@@ -314,13 +330,14 @@ function App() {
                   required
                 >
                   <option value="">Select a time</option>
-                  {timeSlots.map((slot, index) => (
+                  {getAvailableTimeSlots(classDate2).map((slot, index) => (
                     <option key={index} value={slot} disabled={getDisabledTimes(classDate2).includes(slot)}>
                       {slot}
                     </option>
                   ))}
                 </select>
               </div>
+
 
               <div className="col-12">
                 <div className="form-check">
