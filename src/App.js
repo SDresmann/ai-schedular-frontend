@@ -46,40 +46,41 @@ function App() {
 
 
 
-  async function updateValidDates() {
-    try {
-        const response = await axios.get("https://ai-schedular-backend.onrender.com/api/booked-dates");
-        const fullyBookedDates = response.data; // Example format: { "03/10/2025": ["9am-12pm EST", "2pm-5pm EST"] }
-
-        console.log("✅ Received booked dates from backend:", fullyBookedDates); // Debugging
-
-        let dates = [];
-        let startDate = moment().add(2, "days"); // Start from 2 days ahead
-
-        // Generate 7 valid dates, skipping fully booked ones
-        while (dates.length < 7) {
-            let formattedDate = startDate.format("MM/DD/YYYY");
-
-            // ❌ Skip fully booked dates (if all time slots are taken)
-            if (!(fullyBookedDates[formattedDate] && fullyBookedDates[formattedDate].length >= timeSlots.length)) {
-                dates.push(formattedDate);
-            }
-
-            // Move to the next weekday (Monday-Friday only)
-            startDate = getNextWeekday(startDate.clone().add(1, "day"));
-        }
-
-        setValidDates(dates);
-        setBookedDates(fullyBookedDates);
-        console.log("📌 Updated valid dates:", dates); // ✅ Debugging Log
-
-    } catch (error) {
-        console.error("❌ Error updating valid dates:", error);
+async function updateValidDates() {
+  try {
+    // Check if cached dates exist
+    const cachedDates = sessionStorage.getItem("validDates");
+    if (cachedDates) {
+      setValidDates(JSON.parse(cachedDates));
+      console.log("✅ Loaded dates from cache");
+      return;
     }
+
+    const response = await axios.get("https://ai-schedular-backend.onrender.com/api/booked-dates");
+    const fullyBookedDates = response.data;
+
+    let dates = [];
+    let startDate = moment().add(2, "days");
+
+    while (dates.length < 7) {
+      let formattedDate = startDate.format("MM/DD/YYYY");
+      if (!(fullyBookedDates[formattedDate] && fullyBookedDates[formattedDate].length >= timeSlots.length)) {
+        dates.push(formattedDate);
+      }
+      startDate = getNextWeekday(startDate.clone().add(1, "day"));
+    }
+
+    setValidDates(dates);
+    setBookedDates(fullyBookedDates);
+
+    // Store in session storage to speed up reloads
+    sessionStorage.setItem("validDates", JSON.stringify(dates));
+
+    console.log("✅ Fetched and cached valid dates:", dates);
+  } catch (error) {
+    console.error("❌ Error updating valid dates:", error);
+  }
 }
-
-
-
   // Generate an initial list of 7 valid dates (weekdays only) starting from today + 2 days.
   function getInitialValidDates() {
     const startDate = moment().add(2, "days");
@@ -131,13 +132,14 @@ function App() {
     }
 }
 
+useEffect(() => {
+  // Set placeholder dates while fetching from backend
+  const placeholderDates = getInitialValidDates();
+  setValidDates(placeholderDates);
 
-  useEffect(() => {
-    console.log("🔄 Updating valid dates...");
-    updateValidDates();
+  // Fetch actual booked dates from the backend
+  updateValidDates();
 }, []);
-
-
 
   // List of available time slots
   const timeSlots = [
