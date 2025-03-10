@@ -34,15 +34,16 @@ function App() {
   const getAvailableTimeSlots = (selectedDate) => {
     if (!selectedDate) return [];
 
-    const isFriday = moment(selectedDate, "MM/DD/YYYY").isoWeekday() === 5; // 5 = Friday
+    const isFriday = moment(selectedDate, "MM/DD/YYYY").isoWeekday() === 5;
 
     return timeSlots.filter(slot => {
-      if (slot === "10am-1pm EST/9am-12pm CST") {
-        return isFriday; // Only show this on Fridays
-      }
-      return true;
-    });
-  };
+        if (slot === "10am-1pm EST/9am-12pm CST") {
+            return isFriday; // Only show this on Fridays
+        }
+        return true;
+    }).filter(slot => !getDisabledTimes(selectedDate).includes(slot));
+};
+
 
 
   async function updateValidDates() {
@@ -97,7 +98,7 @@ function App() {
         const response = await axios.get("https://ai-schedular-backend.onrender.com/api/booked-dates");
         const fullyBookedDates = response.data; // Example: { "03/10/2025": ["9am-12pm EST", "2pm-5pm EST"] }
 
-        console.log("✅ Received booked dates from backend:", fullyBookedDates); // Debugging
+        console.log("✅ Received booked dates from backend:", fullyBookedDates); // Debugging Log
 
         let dates = [];
         let startDate = moment().add(2, "days"); // Start from 2 days ahead
@@ -105,8 +106,14 @@ function App() {
         while (dates.length < 7) {
             let formattedDate = startDate.format("MM/DD/YYYY");
 
-            // ❌ Skip fully booked dates (if all time slots are taken)
-            if (!(fullyBookedDates[formattedDate] && fullyBookedDates[formattedDate].length >= timeSlots.length)) {
+            // 🔹 Check if it's a Friday
+            const isFriday = startDate.isoWeekday() === 5;
+
+            // 🔹 Determine how many time slots should be available
+            let requiredSlots = isFriday ? 3 : 2; // Fridays have 3 slots, others have 2
+
+            // ❌ Skip fully booked dates (if all available slots are taken)
+            if (!(fullyBookedDates[formattedDate] && fullyBookedDates[formattedDate].length >= requiredSlots)) {
                 dates.push(formattedDate);
             }
 
@@ -114,7 +121,7 @@ function App() {
             startDate = getNextWeekday(startDate.clone().add(1, "day"));
         }
 
-        console.log("📌 Final valid dates list:", dates); // ✅ Debugging Log
+        console.log("📌 Final valid dates list (after removing fully booked):", dates);
 
         setValidDates([...dates]); // ✅ Ensure React re-renders
         setBookedDates({...fullyBookedDates}); // ✅ Store booked dates properly
@@ -123,6 +130,7 @@ function App() {
         console.error("❌ Error updating valid dates:", error);
     }
 }
+
 
   useEffect(() => {
     console.log("🔄 Updating valid dates...");
