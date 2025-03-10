@@ -47,20 +47,23 @@ function App() {
   async function updateValidDates() {
     try {
       const response = await axios.get("https://ai-schedular-backend.onrender.com/api/booked-dates");
-      const fullyBookedDates = response.data;
+      const fullyBookedDates = response.data; // Expected format: { "MM/DD/YYYY": ["9am-12pm EST", "2pm-5pm EST"] }
 
-      console.log("✅ Received booked dates from backend:", fullyBookedDates); // 🚀 Debugging Log
+      console.log("✅ Received booked dates from backend:", fullyBookedDates);
 
       let dates = getInitialValidDates();
+
+      // Ensure only FULLY booked dates are removed (all time slots taken)
       dates = dates.filter(date => !(fullyBookedDates[date] && fullyBookedDates[date].length >= timeSlots.length));
 
       setValidDates(dates);
-      setBookedDates(fullyBookedDates); // ✅ Update booked dates
+      setBookedDates(fullyBookedDates); // ✅ Store booked dates & times
 
     } catch (error) {
       console.error("❌ Error updating valid dates:", error);
     }
   }
+
 
 
   useEffect(() => {
@@ -81,76 +84,76 @@ function App() {
     setErrorMessage("");
 
     if (!executeRecaptcha) {
-        alert("reCAPTCHA is not initialized");
-        setIsLoading(false);
-        return;
+      alert("reCAPTCHA is not initialized");
+      setIsLoading(false);
+      return;
     }
 
     // 🚨 Prevent submission if both classDate & time are the same for both slots
     if (classDate === classDate2 && time === time2) {
-        setErrorMessage(`❌ You selected the same date (${classDate}) and time (${time}) for both slots. Please choose a different one.`);
-        setIsLoading(false);
-        return;
+      setErrorMessage(`❌ You selected the same date (${classDate}) and time (${time}) for both slots. Please choose a different one.`);
+      setIsLoading(false);
+      return;
     }
 
     try {
-        // ✅ Step 1: Check availability for both date/time selections
-        const [availabilityResponse1, availabilityResponse2] = await Promise.all([
-            axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", { classDate, time }),
-            axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", { classDate: classDate2, time: time2 })
-        ]);
+      // ✅ Step 1: Check availability for both date/time selections
+      const [availabilityResponse1, availabilityResponse2] = await Promise.all([
+        axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", { classDate, time }),
+        axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", { classDate: classDate2, time: time2 })
+      ]);
 
-        let errorMessages = [];
+      let errorMessages = [];
 
-        if (!availabilityResponse1.data.available) {
-            errorMessages.push(`❌ Date **${classDate}** and Time **${time}** are already booked.`);
+      if (!availabilityResponse1.data.available) {
+        errorMessages.push(`❌ Date **${classDate}** and Time **${time}** are already booked.`);
+      }
+      if (!availabilityResponse2.data.available) {
+        errorMessages.push(`❌ Date **${classDate2}** and Time **${time2}** are already booked.`);
+      }
+
+      if (errorMessages.length > 0) {
+        setErrorMessage(errorMessages.join("\n"));
+        setIsLoading(false);
+        return;
+      }
+
+      // ✅ Step 2: Proceed with form submission if dates & times are available
+      const recaptchaToken = await executeRecaptcha("submit_form");
+      const formData = {
+        firstName,
+        lastName,
+        email,
+        company,
+        phoneNumber,
+        time,
+        time2,
+        classDate,
+        classDate2,
+        recaptchaToken,
+      };
+
+      const response = await axios.post(
+        "https://ai-schedular-backend.onrender.com/api/intro-to-ai-payment",
+        formData,
+        {
+          withCredentials: true,
+          headers: { "Content-Type": "application/json" },
         }
-        if (!availabilityResponse2.data.available) {
-            errorMessages.push(`❌ Date **${classDate2}** and Time **${time2}** are already booked.`);
-        }
+      );
 
-        if (errorMessages.length > 0) {
-            setErrorMessage(errorMessages.join("\n"));
-            setIsLoading(false);
-            return;
-        }
+      updateValidDates();
 
-        // ✅ Step 2: Proceed with form submission if dates & times are available
-        const recaptchaToken = await executeRecaptcha("submit_form");
-        const formData = {
-            firstName,
-            lastName,
-            email,
-            company,
-            phoneNumber,
-            time,
-            time2,
-            classDate,
-            classDate2,
-            recaptchaToken,
-        };
-
-        const response = await axios.post(
-            "https://ai-schedular-backend.onrender.com/api/intro-to-ai-payment",
-            formData,
-            {
-                withCredentials: true,
-                headers: { "Content-Type": "application/json" },
-            }
-        );
-
-        updateValidDates();
-
-        // ✅ Redirect to thank-you page
-        window.top.location.href = "https://ka.kableacademy.com/intro-to-ai-bulk-tech-cred-scheduler-thank-you";
+      // ✅ Redirect to thank-you page
+      window.top.location.href = "https://ka.kableacademy.com/intro-to-ai-bulk-tech-cred-scheduler-thank-you";
 
     } catch (error) {
-        console.error("Error during form submission:", error);
-        setErrorMessage("❌ An error occurred. Please try again.");
+      console.error("Error during form submission:", error);
+      setErrorMessage("❌ An error occurred. Please try again.");
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
-};
+  };
 
 
 
@@ -258,32 +261,26 @@ function App() {
                 </select>
               </div>
               <div className="col-md-6">
-                <label htmlFor="inputTime" className="form-label">Program Time 1</label>
+                <label htmlFor="inputDate" className="form-label">Class Date 1</label>
                 <select
                   className="form-select form-select mb-3"
-                  id="inputTime"
-                  value={time}
-                  onChange={(e) => setTime(e.target.value)}
+                  id="inputDate"
+                  value={classDate}
+                  onChange={(e) => setClassDate(e.target.value)}
                   required
                 >
-                  <option value="">Select a time</option>
-                  {timeSlots
-                    .filter(slot => !slot.isFridayOnly || moment(classDate, "MM/DD/YYYY").isoWeekday() === 5)
-                    .map((slot, index) => (
-                      <option key={index} value={slot.value}>
-                        {slot.label}
-                      </option>
-                    ))}
+                  <option value="">Please select a date</option>
+                  {validDates.map((date, index) => (
+                    <option key={index} value={moment(date).format("MM/DD/YYYY")}
+                      disabled={bookedDates[date] && bookedDates[date].length >= timeSlots.length}>
+                      {moment(date).format("MM/DD/YYYY")}
+                    </option>
+                  ))}
                 </select>
               </div>
 
               <div className="col-md-6">
                 <label htmlFor="inputDate2" className="form-label">Class Date 2</label>
-
-                {/* 🚀 Debugging Log */}
-                {console.log("🔍 Valid Dates:", validDates)}
-                {console.log("🔍 Booked Dates State:", bookedDates)}
-
                 <select
                   className="form-select form-select mb-3"
                   id="inputDate2"
@@ -293,11 +290,8 @@ function App() {
                 >
                   <option value="">Please select a date</option>
                   {validDates.map((date, index) => (
-                    <option
-                      key={index}
-                      value={moment(date).format("MM/DD/YYYY")}
-                      disabled={bookedDates[date] && bookedDates[date].length >= timeSlots.length}
-                    >
+                    <option key={index} value={moment(date).format("MM/DD/YYYY")}
+                      disabled={bookedDates[date] && bookedDates[date].length >= timeSlots.length}>
                       {moment(date).format("MM/DD/YYYY")}
                     </option>
                   ))}
