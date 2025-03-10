@@ -47,26 +47,34 @@ function App() {
 
   async function updateValidDates() {
     try {
-      const response = await axios.get("https://ai-schedular-backend.onrender.com/api/booked-dates");
-      const fullyBookedDates = response.data;
+        const response = await axios.get("https://ai-schedular-backend.onrender.com/api/booked-dates");
+        const fullyBookedDates = response.data; // Example format: { "03/10/2025": ["9am-12pm EST", "2pm-5pm EST"] }
 
-      console.log("✅ Received booked dates from backend:", fullyBookedDates); // 🔍 Debugging Log
+        console.log("✅ Received booked dates from backend:", fullyBookedDates); // Debugging
 
-      let dates = getInitialValidDates();
+        let dates = [];
+        let startDate = moment().add(2, "days"); // Start from 2 days ahead
 
-      // 🚨 Remove fully booked dates from the valid list
-      dates = dates.filter(date => {
-        return !(fullyBookedDates[date] && fullyBookedDates[date].length >= timeSlots.length);
-      });
+        // Generate 7 valid dates, skipping fully booked ones
+        while (dates.length < 7) {
+            let formattedDate = startDate.format("MM/DD/YYYY");
 
-      setValidDates(dates);
-      setBookedDates(fullyBookedDates); // ✅ Store booked times per date
+            // If all time slots for a date are taken, skip it
+            if (!(fullyBookedDates[formattedDate] && fullyBookedDates[formattedDate].length >= timeSlots.length)) {
+                dates.push(formattedDate);
+            }
+
+            // Move to the next weekday (Monday-Friday only)
+            startDate = getNextWeekday(startDate.clone().add(1, "day"));
+        }
+
+        setValidDates(dates);
+        setBookedDates(fullyBookedDates);
 
     } catch (error) {
-      console.error("❌ Error updating valid dates:", error);
+        console.error("❌ Error updating valid dates:", error);
     }
-  }
-
+}
 
 
   // Generate an initial list of 7 valid dates (weekdays only) starting from today + 2 days.
