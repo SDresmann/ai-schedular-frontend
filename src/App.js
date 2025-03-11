@@ -7,7 +7,7 @@ function App() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
-  const [company, setCompany] = useState('');
+  const [yourCompany, setYourCompany] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [time, setTime] = useState('');
   const [time2, setTime2] = useState('');
@@ -16,11 +16,11 @@ function App() {
   const [termsChecked, setTermsChecked] = useState(false);
   const [validDates, setValidDates] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const { executeRecaptcha } = useGoogleReCaptcha();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [bookedDates, setBookedDates] = useState({});
   const [datesLoading, setDatesLoading] = useState(true);
+  const { executeRecaptcha } = useGoogleReCaptcha();
 
 
   // Utility: Get next weekday (Monday-Friday) from a given moment date.
@@ -210,7 +210,7 @@ useEffect(() => {
         firstName,
         lastName,
         email,
-        company,
+        yourCompany,
         phoneNumber,
         time,
         time2,
@@ -300,8 +300,8 @@ useEffect(() => {
                   type="text"
                   className="form-control"
                   id="inputCompnay"
-                  value={company}
-                  onChange={(e) => setCompany(e.target.value)}
+                  value={yourCompany}
+                  onChange={(e) => setYourCompany(e.target.value)}
                   required
                 />
               </div>
