@@ -34,57 +34,54 @@ function App() {
 
   const getAvailableTimeSlots = (selectedDate) => {
     if (!selectedDate) return [];
-
-    const isFriday = moment(selectedDate, "MM/DD/YYYY").isoWeekday() === 5;
-
+  
+    const isFriday = moment(selectedDate, "MM/DD/YYYY").isoWeekday() === 5; // 5 = Friday
+  
     return timeSlots.filter(slot => {
-        if (slot === "10am-1pm EST/9am-12pm CST") {
-            return isFriday; // Only show this on Fridays
-        }
-        return true;
-    }).filter(slot => !getDisabledTimes(selectedDate).includes(slot));
-};
-
-
-
-async function updateValidDates() {
-  try {
-    // Check if cached dates exist
-    const cachedDates = sessionStorage.getItem("validDates");
-    if (cachedDates) {
-      setValidDates(JSON.parse(cachedDates));
-      console.log("✅ Loaded dates from cache");
-      return;
-    }
-
-    const response = await axios.get("https://ai-schedular-backend.onrender.com/api/booked-dates");
-    const fullyBookedDates = response.data;
-
-    let dates = [];
-    let startDate = moment().add(2, "days");
-
-    while (dates.length < 7) {
-      let formattedDate = startDate.format("MM/DD/YYYY");
-      if (!(fullyBookedDates[formattedDate] && fullyBookedDates[formattedDate].length >= timeSlots.length)) {
-        dates.push(formattedDate);
+      if (slot === "10am-1pm EST/9am-12pm CST") {
+        return isFriday; // Show this slot ONLY on Fridays
       }
-      startDate = getNextWeekday(startDate.clone().add(1, "day"));
-    }
-
-    setValidDates(dates);
-    setBookedDates(fullyBookedDates);
-
-    // Store in session storage to speed up reloads
-    sessionStorage.setItem("validDates", JSON.stringify(dates));
-
-    console.log("✅ Fetched and cached valid dates:", dates);
-  } catch (error) {
-    console.error("❌ Error updating valid dates:", error);
-  }
-}
+      return !isFriday; // Hide it on other days
+    }).filter(slot => !getDisabledTimes(selectedDate).includes(slot));
+  };
 
 
 
+// async function updateValidDates() {
+//   try {
+//     // Check if cached dates exist
+//     const cachedDates = sessionStorage.getItem("validDates");
+//     if (cachedDates) {
+//       setValidDates(JSON.parse(cachedDates));
+//       console.log("✅ Loaded dates from cache");
+//       return;
+//     }
+
+//     const response = await axios.get("https://ai-schedular-backend.onrender.com/api/booked-dates");
+//     const fullyBookedDates = response.data;
+
+//     let dates = [];
+//     let startDate = moment().add(2, "days");
+
+//     while (dates.length < 7) {
+//       let formattedDate = startDate.format("MM/DD/YYYY");
+//       if (!(fullyBookedDates[formattedDate] && fullyBookedDates[formattedDate].length >= timeSlots.length)) {
+//         dates.push(formattedDate);
+//       }
+//       startDate = getNextWeekday(startDate.clone().add(1, "day"));
+//     }
+
+//     setValidDates(dates);
+//     setBookedDates(fullyBookedDates);
+
+//     // Store in session storage to speed up reloads
+//     sessionStorage.setItem("validDates", JSON.stringify(dates));
+
+//     console.log("✅ Fetched and cached valid dates:", dates);
+//   } catch (error) {
+//     console.error("❌ Error updating valid dates:", error);
+//   }
+// }
 
   // Generate an initial list of 7 valid dates (weekdays only) starting from today + 2 days.
   function getInitialValidDates() {
@@ -101,44 +98,63 @@ async function updateValidDates() {
   // Fetch fully booked dates and update valid dates accordingly.
   async function updateValidDates() {
     try {
-        const response = await axios.get("https://ai-schedular-backend.onrender.com/api/booked-dates");
-        const fullyBookedDates = response.data; // Example: { "03/10/2025": ["9am-12pm EST", "2pm-5pm EST"] }
-
-        console.log("✅ Received booked dates from backend:", fullyBookedDates); // Debugging Log
-
-        let dates = [];
-        let startDate = moment().add(2, "days"); // Start from 2 days ahead
-
-        while (dates.length < 7) {
-            let formattedDate = startDate.format("MM/DD/YYYY");
-
-            // 🔹 Check if it's a Friday
-            const isFriday = startDate.isoWeekday() === 5;
-
-            // 🔹 Determine how many time slots should be available
-            let requiredSlots = isFriday ? 3 : 2; // Fridays have 3 slots, others have 2
-
-            // ❌ Skip fully booked dates (if all available slots are taken)
-            if (!(fullyBookedDates[formattedDate] && fullyBookedDates[formattedDate].length >= requiredSlots)) {
-                dates.push(formattedDate);
-            }
-
-            // Move to the next weekday (Monday-Friday only)
-            startDate = getNextWeekday(startDate.clone().add(1, "day"));
+      setDatesLoading(true); // Start loading state
+  
+      // 🔹 Check if cached dates exist
+      const cachedDates = sessionStorage.getItem("validDates");
+      const cachedBookedDates = sessionStorage.getItem("bookedDates");
+  
+      if (cachedDates && cachedBookedDates) {
+        setValidDates(JSON.parse(cachedDates));
+        setBookedDates(JSON.parse(cachedBookedDates));
+        console.log("✅ Loaded dates from cache");
+        setDatesLoading(false);
+        return;
+      }
+  
+      // 🔹 Fetch latest booked dates from backend
+      const response = await axios.get("https://ai-schedular-backend.onrender.com/api/booked-dates");
+      const fullyBookedDates = response.data; // Example: { "03/10/2025": ["9am-12pm EST", "2pm-5pm EST"] }
+  
+      console.log("✅ Received booked dates from backend:", fullyBookedDates);
+  
+      let dates = [];
+      let startDate = moment().add(2, "days"); // Start from 2 days ahead
+  
+      while (dates.length < 7) {
+        let formattedDate = startDate.format("MM/DD/YYYY");
+  
+        // 🔹 Check if it's a Friday
+        const isFriday = startDate.isoWeekday() === 5;
+  
+        // 🔹 Determine how many time slots should be available
+        let requiredSlots = isFriday ? 3 : 2; // Fridays have 3 slots, others have 2
+  
+        // ❌ Skip fully booked dates
+        if (!(fullyBookedDates[formattedDate] && fullyBookedDates[formattedDate].length >= requiredSlots)) {
+          dates.push(formattedDate);
         }
-
-        console.log("📌 Final valid dates list (after removing fully booked):", dates);
-
-        setValidDates([...dates]); // ✅ Ensure React re-renders
-        setBookedDates({...fullyBookedDates}); // ✅ Store booked dates properly
-        setDatesLoading(false); // ✅ Stop loading when done
-
+  
+        // Move to the next weekday (Monday-Friday only)
+        startDate = getNextWeekday(startDate.clone().add(1, "day"));
+      }
+  
+      console.log("📌 Final valid dates list (after removing fully booked):", dates);
+  
+      // ✅ Cache available dates
+      sessionStorage.setItem("validDates", JSON.stringify(dates));
+      sessionStorage.setItem("bookedDates", JSON.stringify(fullyBookedDates));
+  
+      // ✅ Update state
+      setValidDates([...dates]);
+      setBookedDates({...fullyBookedDates});
     } catch (error) {
-        console.error("❌ Error updating valid dates:", error);
-        setDatesLoading(false); // Stop loading even if there's an error
+      console.error("❌ Error updating valid dates:", error);
+    } finally {
+      setDatesLoading(false); // Stop loading
     }
-}
-
+  }
+  
 
 useEffect(() => {
   // Set placeholder dates while fetching from backend
@@ -148,9 +164,6 @@ useEffect(() => {
   // Fetch actual booked dates from the backend
   updateValidDates();
 }, []);
-
-
-
 
   // List of available time slots
   const timeSlots = [
@@ -168,43 +181,36 @@ useEffect(() => {
     e.preventDefault();
     setIsLoading(true);
     setErrorMessage("");
-
+  
     if (!executeRecaptcha) {
       alert("reCAPTCHA is not initialized");
       setIsLoading(false);
       return;
     }
-
-    // 🚨 Prevent submission if both classDate & time are the same for both slots
-    if (classDate === classDate2 && time === time2) {
-      setErrorMessage(`❌ You selected the same date (${classDate}) and time (${time}) for both slots. Please choose a different one.`);
-      setIsLoading(false);
-      return;
-    }
-
+  
     try {
-      // ✅ Step 1: Check availability for both date/time selections
+      // ✅ Check availability
       const [availabilityResponse1, availabilityResponse2] = await Promise.all([
         axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", { classDate, time }),
         axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", { classDate: classDate2, time: time2 })
       ]);
-
+  
       let errorMessages = [];
-
+  
       if (!availabilityResponse1.data.available) {
         errorMessages.push(`❌ Date **${classDate}** and Time **${time}** are already booked.`);
       }
       if (!availabilityResponse2.data.available) {
         errorMessages.push(`❌ Date **${classDate2}** and Time **${time2}** are already booked.`);
       }
-
+  
       if (errorMessages.length > 0) {
         setErrorMessage(errorMessages.join("\n"));
         setIsLoading(false);
         return;
       }
-
-      // ✅ Step 2: Proceed with form submission if dates & times are available
+  
+      // ✅ Submit form data
       const recaptchaToken = await executeRecaptcha("submit_form");
       const formData = {
         firstName,
@@ -218,8 +224,8 @@ useEffect(() => {
         classDate2,
         recaptchaToken,
       };
-
-      const response = await axios.post(
+  
+      await axios.post(
         "https://ai-schedular-backend.onrender.com/api/intro-to-ai-payment",
         formData,
         {
@@ -227,12 +233,17 @@ useEffect(() => {
           headers: { "Content-Type": "application/json" },
         }
       );
-
+  
+      // 🔥 Clear cached dates after booking
+      sessionStorage.removeItem("validDates");
+      sessionStorage.removeItem("bookedDates");
+  
+      // 🔄 Refresh dates after submission
       updateValidDates();
-
+  
       // ✅ Redirect to thank-you page
-      window.top.location.href = "https://ka.kableacademy.com/techcred-registration-thank-you ";
-
+      window.top.location.href = "https://ka.kableacademy.com/techcred-registration-thank-you";
+  
     } catch (error) {
       console.error("Error during form submission:", error);
       setErrorMessage("❌ An error occurred. Please try again.");
@@ -240,10 +251,7 @@ useEffect(() => {
       setIsLoading(false);
     }
   };
-
-
-
-
+  
 
   return (
     <GoogleReCaptchaProvider reCaptchaKey={process.env.REACT_APP_SITE_KEY}>
@@ -292,7 +300,6 @@ useEffect(() => {
                   required
                 />
               </div>
-
 
               <div className="col-6">
                 <label htmlFor="inputCompany" className="form-label">Company Name</label>
@@ -365,8 +372,6 @@ useEffect(() => {
                 </select>
               </div>
 
-
-
               <div className="col-md-6">
                 <label htmlFor="inputDate2" className="form-label">Class Date 2</label>
                 <select
@@ -402,7 +407,6 @@ useEffect(() => {
                   ))}
                 </select>
               </div>
-
 
               <div className="col-12">
                 <div className="form-check">
