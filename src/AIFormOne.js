@@ -187,7 +187,7 @@ useEffect(() => {
 
   // Fetch actual booked dates from the backend
   updateValidDates();
-}, []);
+}, [bookedDates]);
 
   // List of available time slots
   const timeSlots = [
