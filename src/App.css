@@ -15,3 +15,10 @@ a{
 .form-check-label{
   font-size: 13px !important;
 }
+
+.booked-date {
+  background-color: #d3d3d3 !important; /* Light grey */
+  color: #333 !important; /* Darker text */
+  border-radius: 5px;
+  pointer-events: none; /* Prevent selection */
+}
