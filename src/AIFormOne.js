@@ -12,9 +12,7 @@ function AIFormOne() {
   const [yourCompany, setYourCompany] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [time, setTime] = useState('');
-  const [time2, setTime2] = useState('');
   const [classDate, setClassDate] = useState('');
-  const [classDate2, setClassDate2] = useState('');
   const [termsChecked, setTermsChecked] = useState(false);
   const [validDates, setValidDates] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -241,9 +239,7 @@ useEffect(() => {
         yourCompany,
         phoneNumber,
         time,
-        time2,
         classDate,
-        classDate2,
         recaptchaToken,
       };
   
