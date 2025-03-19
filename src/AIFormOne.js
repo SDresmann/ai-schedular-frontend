@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import moment from 'moment';
 import DatePicker from "react-datepicker";
@@ -108,21 +108,24 @@ function AIFormOne() {
 // }
 
   // Generate an initial list of 7 valid dates (weekdays only) starting from today + 2 days.
-  function getInitialValidDates() {
+  const getInitialValidDates = useCallback(() => {
     const startDate = moment().add(2, "days");
     let nextValidDate = getNextWeekday(startDate);
     const dates = [];
+  
     for (let i = 0; i < 7; i++) {
       dates.push(nextValidDate.format("MM/DD/YYYY"));
       nextValidDate = getNextWeekday(nextValidDate.clone().add(1, "day"));
     }
+  
     return dates;
-  }
+  }, []); // ✅ Empty dependency array makes it stable
+  
 
   // Fetch fully booked dates and update valid dates accordingly.
-  async function updateValidDates() {
+  const updateValidDates = useCallback(async () => {
     try {
-      setDatesLoading(true); // Start loading state
+      setDatesLoading(true);
   
       // 🔹 Check if cached dates exist
       const cachedDates = sessionStorage.getItem("validDates");
@@ -138,12 +141,10 @@ function AIFormOne() {
   
       // 🔹 Fetch latest booked dates from backend
       const response = await axios.get("https://ai-schedular-backend.onrender.com/api/booked-dates");
-      const fullyBookedDates = response.data; // Example: { "03/10/2025": ["9am-12pm EST", "2pm-5pm EST"] }
-  
-      console.log("✅ Received booked dates from backend:", fullyBookedDates);
+      const fullyBookedDates = response.data;
   
       let dates = [];
-      let startDate = moment().add(2, "days"); // Start from 2 days ahead
+      let startDate = moment().add(2, "days");
   
       while (dates.length < 7) {
         let formattedDate = startDate.format("MM/DD/YYYY");
@@ -152,7 +153,7 @@ function AIFormOne() {
         const isFriday = startDate.isoWeekday() === 5;
   
         // 🔹 Determine how many time slots should be available
-        let requiredSlots = isFriday ? 3 : 2; // Fridays have 3 slots, others have 2
+        let requiredSlots = isFriday ? 3 : 2;
   
         // ❌ Skip fully booked dates
         if (!(fullyBookedDates[formattedDate] && fullyBookedDates[formattedDate].length >= requiredSlots)) {
@@ -163,7 +164,7 @@ function AIFormOne() {
         startDate = getNextWeekday(startDate.clone().add(1, "day"));
       }
   
-      console.log("📌 Final valid dates list (after removing fully booked):", dates);
+      console.log("📌 Final valid dates list:", dates);
   
       // ✅ Cache available dates
       sessionStorage.setItem("validDates", JSON.stringify(dates));
@@ -175,9 +176,10 @@ function AIFormOne() {
     } catch (error) {
       console.error("❌ Error updating valid dates:", error);
     } finally {
-      setDatesLoading(false); // Stop loading
+      setDatesLoading(false);
     }
-  }
+  }, []); // ✅ Empty dependency array ensures function remains stable
+  
   
 
 useEffect(() => {
@@ -187,7 +189,7 @@ useEffect(() => {
 
   // Fetch actual booked dates from the backend
   updateValidDates();
-}, [bookedDates]);
+}, [getInitialValidDates, updateValidDates]);
 
   // List of available time slots
   const timeSlots = [
@@ -214,7 +216,7 @@ useEffect(() => {
   
     try {
       // ✅ Check availability
-      const [availabilityResponse1, availabilityResponse2] = await Promise.all([
+      const [availabilityResponse1] = await Promise.all([
         axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", { classDate, time }),
       ]);
   
