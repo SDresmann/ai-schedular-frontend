@@ -235,6 +235,9 @@ useEffect(() => {
       if (!availabilityResponse2.data.available) {
         errorMessages.push(`❌ Date **${classDate2}** and Time **${time2}** are already booked.`);
       }
+      if (!availabilityResponse3.data.available) {
+        errorMessages.push(`❌ Date **${classDate2}** and Time **${time3}** are already booked.`);
+      }
   
       if (errorMessages.length > 0) {
         setErrorMessage(errorMessages.join("\n"));

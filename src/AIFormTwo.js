@@ -210,8 +210,7 @@ function AIFormTwo() {
       // ✅ Check availability
       const [availabilityResponse1, availabilityResponse2] = await Promise.all([
         axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", { classDate, time }),
-        axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", { classDate: classDate2, time: time2 }),
-        axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", { classDate: classDate3, time: time3 })
+        axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", { classDate: classDate2, time: time2 })
       ]);
   
       let errorMessages = [];
@@ -222,9 +221,7 @@ function AIFormTwo() {
       if (!availabilityResponse2.data.available) {
         errorMessages.push(`❌ Date **${classDate2}** and Time **${time2}** are already booked.`);
       }
-      if (!availabilityResponse2.data.available) {
-        errorMessages.push(`❌ Date **${classDate3}** and Time **${time3}** are already booked.`);
-      }
+ 
   
       if (errorMessages.length > 0) {
         setErrorMessage(errorMessages.join("\n"));
