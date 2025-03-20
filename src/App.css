@@ -21,4 +21,5 @@ a{
   color: #333 !important; /* Darker text */
   border-radius: 5px;
   pointer-events: none; /* Prevent selection */
+  text-decoration: line-through;
 }
