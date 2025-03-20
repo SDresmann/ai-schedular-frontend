@@ -221,7 +221,7 @@ useEffect(() => {
   
     try {
       // ✅ Check availability
-      const [availabilityResponse1, availabilityResponse2] = await Promise.all([
+      const [availabilityResponse1, availabilityResponse2, availabilityResponse3] = await Promise.all([
         axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", { classDate, time }),
         axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", { classDate: classDate2, time: time2 }),
         axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", { classDate: classDate3, time: time3 })
