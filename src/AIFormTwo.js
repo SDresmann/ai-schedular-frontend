@@ -48,15 +48,18 @@ function AIFormTwo() {
   };
 
   const isDateDisabled = (date) => {
-    if (!bookedDates || typeof bookedDates !== "object") return false; // Ensure bookedDates is valid
+    if (!bookedDates || typeof bookedDates !== "object") return false;
   
     const formattedDate = moment(date).format("MM/DD/YYYY");
   
-    // Check if the date is fully booked
+    // 🔹 Check if the date is fully booked
     const isFullyBooked = Object.keys(bookedDates).includes(formattedDate);
   
-    // Check if the date falls on a weekend (Saturday = 6, Sunday = 7)
+    // 🔹 Check if the date falls on a weekend
     const isWeekend = moment(date).isoWeekday() >= 6;
+  
+    // 🔥 Debugging Logs
+    console.log(`Checking if ${formattedDate} is disabled:`, { isFullyBooked, isWeekend });
   
     return isFullyBooked || isWeekend;
   };
@@ -128,74 +131,57 @@ function AIFormTwo() {
   // Fetch fully booked dates and update valid dates accordingly.
   const updateValidDates = useCallback(async () => {
     try {
-      setDatesLoading(true);
-  
-      // 🔹 Check if cached dates exist
-      const cachedDates = sessionStorage.getItem("validDates");
-      const cachedBookedDates = sessionStorage.getItem("bookedDates");
-  
-      if (cachedDates && cachedBookedDates) {
-        setValidDates(JSON.parse(cachedDates));
-        setBookedDates(JSON.parse(cachedBookedDates));
-        console.log("✅ Loaded dates from cache");
-        setDatesLoading(false);
-        return;
-      }
-  
-      // 🔹 Fetch latest booked dates from backend
-      const response = await axios.get("https://ai-schedular-backend.onrender.com/api/booked-dates");
-      const fullyBookedDates = response.data;
-  
-      console.log("✅ Received booked dates from backend:", fullyBookedDates);
-  
-      setBookedDates(fullyBookedDates); // ✅ Store in state properly
-      let dates = [];
-      let startDate = moment().add(2, "days");
-  
-      while (dates.length < 7) {
-        let formattedDate = startDate.format("MM/DD/YYYY");
-  
-        // 🔹 Check if it's a Friday
-        const isFriday = startDate.isoWeekday() === 5;
-  
-        // 🔹 Determine how many time slots should be available
-        let requiredSlots = isFriday ? 3 : 2;
-  
-        // ❌ Skip fully booked dates
-        if (!(fullyBookedDates[formattedDate] && fullyBookedDates[formattedDate].length >= requiredSlots)) {
-          dates.push(formattedDate);
+        setDatesLoading(true);
+
+        // Fetch latest booked dates from backend
+        const response = await axios.get("https://ai-schedular-backend.onrender.com/api/booked-dates");
+        const fullyBookedDates = response.data;
+
+        console.log("✅ Received latest booked dates:", fullyBookedDates);
+
+        setBookedDates(fullyBookedDates); // ✅ Update state
+
+        let dates = [];
+        let startDate = moment().add(2, "days");
+
+        while (dates.length < 7) {
+            let formattedDate = startDate.format("MM/DD/YYYY");
+
+            // Check if it's a Friday
+            const isFriday = startDate.isoWeekday() === 5;
+            let requiredSlots = isFriday ? 3 : 2;
+
+            // Skip fully booked dates
+            if (!(fullyBookedDates[formattedDate] && fullyBookedDates[formattedDate].length >= requiredSlots)) {
+                dates.push(formattedDate);
+            }
+
+            // Move to the next weekday (Monday-Friday only)
+            startDate = getNextWeekday(startDate.clone().add(1, "day"));
         }
-  
-        // Move to the next weekday (Monday-Friday only)
-        startDate = getNextWeekday(startDate.clone().add(1, "day"));
-      }
-  
-      console.log("📌 Final valid dates list:", dates);
-  
-      // ✅ Cache available dates
-      sessionStorage.setItem("validDates", JSON.stringify(dates));
-      sessionStorage.setItem("bookedDates", JSON.stringify(fullyBookedDates));
-  
-      // ✅ Update state
-      setValidDates([...dates]);
-      setBookedDates({...fullyBookedDates});
+
+        console.log("📌 Final valid dates list:", dates);
+
+        // ✅ Cache available dates and booked dates
+        sessionStorage.setItem("validDates", JSON.stringify(dates));
+        sessionStorage.setItem("bookedDates", JSON.stringify(fullyBookedDates));
+
+        setValidDates([...dates]);
     } catch (error) {
-      console.error("❌ Error updating valid dates:", error);
+        console.error("❌ Error updating valid dates:", error);
     } finally {
-      setDatesLoading(false);
+        setDatesLoading(false);
     }
-  }, []); // ✅ Empty dependency array ensures function remains stable
+}, []);
+// ✅ Empty dependency array ensures it doesn't update on every render
+
   
   
 
-useEffect(() => {
-  // Set placeholder dates while fetching from backend
-  const placeholderDates = getInitialValidDates();
-  setValidDates(placeholderDates);
-
-  // Fetch actual booked dates from the backend
-  updateValidDates();
-}, [getInitialValidDates, updateValidDates]);
+  useEffect(() => {
+    console.log("🔄 Fetching latest booked dates...");
+    updateValidDates(); // ✅ Force the latest fetch
+  }, []); // ✅ Runs only once on mount
 
   // List of available time slots
   const timeSlots = [
@@ -224,7 +210,8 @@ useEffect(() => {
       // ✅ Check availability
       const [availabilityResponse1, availabilityResponse2] = await Promise.all([
         axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", { classDate, time }),
-        axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", { classDate: classDate2, time: time2 })
+        axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", { classDate: classDate2, time: time2 }),
+        axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", { classDate: classDate3, time: time3 })
       ]);
   
       let errorMessages = [];
@@ -234,6 +221,9 @@ useEffect(() => {
       }
       if (!availabilityResponse2.data.available) {
         errorMessages.push(`❌ Date **${classDate2}** and Time **${time2}** are already booked.`);
+      }
+      if (!availabilityResponse2.data.available) {
+        errorMessages.push(`❌ Date **${classDate3}** and Time **${time3}** are already booked.`);
       }
   
       if (errorMessages.length > 0) {
