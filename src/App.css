@@ -23,3 +23,7 @@ a{
   pointer-events: none; /* Prevent selection */
   text-decoration: line-through;
 }
+
+.date-picker{
+  margin-right: 10px;
+}

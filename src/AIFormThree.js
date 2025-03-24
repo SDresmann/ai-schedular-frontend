@@ -340,7 +340,7 @@ useEffect(() => {
 
           {/* ✅ Class Date 1 - Calendar Picker */}
           <div className="col-md-6">
-            <label htmlFor="inputDate" className="form-label">Class Date 1</label>
+            <label htmlFor="inputDate" className="form-label date-picker">Class Date 1</label>
             <DatePicker
               selected={classDate}
               onChange={(date) => setClassDate(date)}
@@ -367,7 +367,7 @@ useEffect(() => {
 
           {/* ✅ Class Date 2 - Calendar Picker */}
           <div className="col-md-6">
-            <label htmlFor="inputDate2" className="form-label">Class Date 2</label>
+            <label htmlFor="inputDate2" className="form-label date-picker">Class Date 2</label>
             <DatePicker
               selected={classDate2}
               onChange={(date) => setClassDate2(date)}
@@ -393,7 +393,7 @@ useEffect(() => {
           </div>
           {/* ✅ Class Date 3 - Calendar Picker */}
           <div className="col-md-6">
-            <label htmlFor="inputDate3" className="form-label">Class Date 3</label>
+            <label htmlFor="inputDate3" className="form-label date-picker">Class Date 3</label>
             <DatePicker
               selected={classDate3}
               onChange={(date) => setClassDate3(date)}
