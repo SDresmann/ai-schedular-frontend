@@ -208,32 +208,30 @@ useEffect(() => {
     setIsLoading(true);
     setErrorMessage("");
   
+    // Wait for reCAPTCHA to be ready
     if (!executeRecaptcha) {
-      alert("reCAPTCHA is not initialized");
-      setIsLoading(false);
+      console.warn("⚠️ reCAPTCHA not ready yet, retrying in 500ms...");
+      setTimeout(() => handleSubmit(e), 500);
       return;
     }
   
     try {
-      // ✅ Check availability
-      const [availabilityResponse1] = await Promise.all([
-        axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", { classDate, time }),
-      ]);
+      // ✅ Run reCAPTCHA
+      const recaptchaToken = await executeRecaptcha("submit_form");
   
-      let errorMessages = [];
+      // ✅ Check availability before submitting
+      const availabilityResponse = await axios.post(
+        "https://ai-schedular-backend.onrender.com/api/check-availability",
+        { classDate, time }
+      );
   
-      if (!availabilityResponse1.data.available) {
-        errorMessages.push(`❌ Date **${classDate}** and Time **${time}** are already booked.`);
-      }
-  
-      if (errorMessages.length > 0) {
-        setErrorMessage(errorMessages.join("\n"));
+      if (!availabilityResponse.data.available) {
+        setErrorMessage(`❌ Date **${classDate}** and Time **${time}** are already booked.`);
         setIsLoading(false);
         return;
       }
   
       // ✅ Submit form data
-      const recaptchaToken = await executeRecaptcha("submit_form");
       const formData = {
         firstName,
         lastName,
@@ -254,16 +252,16 @@ useEffect(() => {
         }
       );
   
-      // 🔥 Clear cached dates after booking
+      // 🔄 Clear cached availability data
       sessionStorage.removeItem("validDates");
       sessionStorage.removeItem("bookedDates");
   
-      // 🔄 Refresh dates after submission
+      // 🔄 Update UI
       updateValidDates();
+      setIsSubmitted(true);
   
-      // ✅ Redirect to thank-you page
+      // ✅ Redirect
       window.top.location.href = "https://ka.kableacademy.com/techcred-registration-thank-you";
-  
     } catch (error) {
       console.error("Error during form submission:", error);
       setErrorMessage("❌ An error occurred. Please try again.");
@@ -271,6 +269,7 @@ useEffect(() => {
       setIsLoading(false);
     }
   };
+  
   
 
   return (

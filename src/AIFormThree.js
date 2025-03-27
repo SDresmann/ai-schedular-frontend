@@ -213,18 +213,31 @@ useEffect(() => {
     setIsLoading(true);
     setErrorMessage("");
   
+    // 🛡️ Handle case where reCAPTCHA isn't ready yet
     if (!executeRecaptcha) {
-      alert("reCAPTCHA is not initialized");
-      setIsLoading(false);
+      console.warn("⚠️ reCAPTCHA not ready yet, retrying in 500ms...");
+      setTimeout(() => handleSubmit(e), 500);
       return;
     }
   
     try {
+      // ✅ Run reCAPTCHA
+      const recaptchaToken = await executeRecaptcha("submit_form");
+  
       // ✅ Check availability
       const [availabilityResponse1, availabilityResponse2, availabilityResponse3] = await Promise.all([
-        axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", { classDate, time }),
-        axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", { classDate: classDate2, time: time2 }),
-        axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", { classDate: classDate3, time: time3 })
+        axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", {
+          classDate,
+          time,
+        }),
+        axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", {
+          classDate: classDate2,
+          time: time2,
+        }),
+        axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", {
+          classDate: classDate3,
+          time: time3,
+        }),
       ]);
   
       let errorMessages = [];
@@ -246,7 +259,6 @@ useEffect(() => {
       }
   
       // ✅ Submit form data
-      const recaptchaToken = await executeRecaptcha("submit_form");
       const formData = {
         firstName,
         lastName,
@@ -271,16 +283,16 @@ useEffect(() => {
         }
       );
   
-      // 🔥 Clear cached dates after booking
+      // ♻️ Clear cached dates
       sessionStorage.removeItem("validDates");
       sessionStorage.removeItem("bookedDates");
   
-      // 🔄 Refresh dates after submission
+      // 🔄 Refresh availability
       updateValidDates();
   
-      // ✅ Redirect to thank-you page
+      // ✅ Redirect
+      setIsSubmitted(true);
       window.top.location.href = "https://ka.kableacademy.com/techcred-registration-thank-you";
-  
     } catch (error) {
       console.error("Error during form submission:", error);
       setErrorMessage("❌ An error occurred. Please try again.");

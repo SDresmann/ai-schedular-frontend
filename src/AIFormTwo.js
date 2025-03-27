@@ -200,17 +200,27 @@ function AIFormTwo() {
     setIsLoading(true);
     setErrorMessage("");
   
+    // 🛡️ Handle case where reCAPTCHA isn't ready yet
     if (!executeRecaptcha) {
-      alert("reCAPTCHA is not initialized");
-      setIsLoading(false);
+      console.warn("⚠️ reCAPTCHA not ready yet, retrying in 500ms...");
+      setTimeout(() => handleSubmit(e), 500);
       return;
     }
   
     try {
-      // ✅ Check availability
+      // ✅ Run reCAPTCHA
+      const recaptchaToken = await executeRecaptcha("submit_form");
+  
+      // ✅ Check availability of both class dates and times
       const [availabilityResponse1, availabilityResponse2] = await Promise.all([
-        axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", { classDate, time }),
-        axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", { classDate: classDate2, time: time2 })
+        axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", {
+          classDate,
+          time,
+        }),
+        axios.post("https://ai-schedular-backend.onrender.com/api/check-availability", {
+          classDate: classDate2,
+          time: time2,
+        }),
       ]);
   
       let errorMessages = [];
@@ -221,7 +231,6 @@ function AIFormTwo() {
       if (!availabilityResponse2.data.available) {
         errorMessages.push(`❌ Date **${classDate2}** and Time **${time2}** are already booked.`);
       }
- 
   
       if (errorMessages.length > 0) {
         setErrorMessage(errorMessages.join("\n"));
@@ -229,8 +238,7 @@ function AIFormTwo() {
         return;
       }
   
-      // ✅ Submit form data
-      const recaptchaToken = await executeRecaptcha("submit_form");
+      // ✅ Prepare and send form data
       const formData = {
         firstName,
         lastName,
@@ -253,16 +261,14 @@ function AIFormTwo() {
         }
       );
   
-      // 🔥 Clear cached dates after booking
+      // ♻️ Refresh dates and clear cache
       sessionStorage.removeItem("validDates");
       sessionStorage.removeItem("bookedDates");
-  
-      // 🔄 Refresh dates after submission
       updateValidDates();
   
-      // ✅ Redirect to thank-you page
+      // ✅ Redirect
+      setIsSubmitted(true);
       window.top.location.href = "https://ka.kableacademy.com/techcred-registration-thank-you";
-  
     } catch (error) {
       console.error("Error during form submission:", error);
       setErrorMessage("❌ An error occurred. Please try again.");
