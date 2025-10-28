@@ -16,13 +16,26 @@ a{
   font-size: 13px !important;
 }
 
-.booked-date {
-  background-color: #d3d3d3 !important; /* Light grey */
-  color: #333 !important; /* Darker text */
-  border-radius: 5px;
-  pointer-events: none; /* Prevent selection */
-  text-decoration: line-through;
+/* Built-in disabled class from react-datepicker */
+.react-datepicker__day--disabled,
+.react-datepicker__month-text--disabled,
+.react-datepicker__quarter-text--disabled,
+.react-datepicker__year-text--disabled {
+  opacity: 0.45 !important;
+  text-decoration: line-through !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important; /* visually and functionally disabled */
 }
+
+/* Visual hints only — do NOT block clicks */
+.partially-booked .react-datepicker__day {
+  outline: 1px dashed #bbb;
+}
+
+.fully-booked .react-datepicker__day {
+  outline: 2px solid #999;
+}
+
 
 .date-picker{
   margin-right: 10px;
