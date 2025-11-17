@@ -5,6 +5,8 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { GoogleReCaptchaProvider, useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 
+const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
+
 function AIFormTwo() {
   const [firstName, setFirstName]     = useState('');
   const [lastName, setLastName]       = useState('');
