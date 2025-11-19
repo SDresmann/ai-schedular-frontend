@@ -5,6 +5,8 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { GoogleReCaptchaProvider, useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 
+const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
+
 function AIFormOne() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -82,7 +84,7 @@ function AIFormOne() {
   // --------------------------------------------------
   const refreshBooked = useCallback(async () => {
     try {
-      const res = await axios.get('https://ai-schedular-backend.onrender.com/api/booked-dates');
+      const res = await axios.get(`${API_BASE}/api/booked-dates`);
       const map = (res?.data && typeof res.data === 'object') ? res.data : {};
       setBookedDates(map);
       sessionStorage.setItem('bookedDates', JSON.stringify(map));
@@ -116,7 +118,7 @@ function AIFormOne() {
       const key1 = classDate ? formatKey(classDate) : null;
 
       const availability = await axios.post(
-        'https://ai-schedular-backend.onrender.com/api/check-availability',
+        `${API_BASE}/api/check-availability`,
         { classDate: key1, time }
       );
 
@@ -138,13 +140,14 @@ function AIFormOne() {
       };
 
       await axios.post(
-        'https://ai-schedular-backend.onrender.com/api/intro-to-ai-payment',
+        `${API_BASE}/api/intro-to-ai-payment`,
         payload,
         {
           withCredentials: true,
           headers: { 'Content-Type': 'application/json' },
         }
       );
+
 
       sessionStorage.removeItem('bookedDates');
       refreshBooked();

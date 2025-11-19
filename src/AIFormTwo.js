@@ -8,24 +8,24 @@ import { GoogleReCaptchaProvider, useGoogleReCaptcha } from 'react-google-recapt
 const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
 
 function AIFormTwo() {
-  const [firstName, setFirstName]     = useState('');
-  const [lastName, setLastName]       = useState('');
-  const [email, setEmail]             = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
   const [yourCompany, setYourCompany] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
 
-  const [time, setTime]   = useState('');
+  const [time, setTime] = useState('');
   const [time2, setTime2] = useState('');
 
-  const [classDate, setClassDate]   = useState(null); // Date objects
+  const [classDate, setClassDate] = useState(null); // Date objects
   const [classDate2, setClassDate2] = useState(null);
 
-  const [bookedDates, setBookedDates]   = useState({});
+  const [bookedDates, setBookedDates] = useState({});
   const [termsChecked, setTermsChecked] = useState(false);
-  const [isLoading, setIsLoading]       = useState(false);
-  const [isSubmitted, setIsSubmitted]   = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const { executeRecaptcha }            = useGoogleReCaptcha();
+  const { executeRecaptcha } = useGoogleReCaptcha();
 
   // --------------------------------------------------
   // Constants & helpers
@@ -36,7 +36,7 @@ function AIFormTwo() {
     '10am-1pm EST/9am-12pm CST', // Friday-only
   ];
   const formatKey = (d) => moment(d).format('MM/DD/YYYY');
-  const isFriday  = (d) => moment(d).isoWeekday() === 5;
+  const isFriday = (d) => moment(d).isoWeekday() === 5;
 
   function getNextWeekday(date) {
     let nextDate = date.clone();
@@ -95,13 +95,13 @@ function AIFormTwo() {
   // Visual classes (purely cosmetic; do NOT block clicks)
   const getDayClassName = (date) => {
     if (!date) return '';
-    const wd       = moment(date).isoWeekday();
+    const wd = moment(date).isoWeekday();
     if (wd >= 6) return '';
 
     const required = wd === 5 ? 3 : 2;
     const rawCount = getRawBookedCount(date);
     if (rawCount >= required) return 'fully-booked';
-    if (rawCount > 0)         return 'partially-booked';
+    if (rawCount > 0) return 'partially-booked';
     return '';
   };
 
@@ -110,7 +110,7 @@ function AIFormTwo() {
   // --------------------------------------------------
   const updateValidDates = useCallback(async () => {
     try {
-      const res = await axios.get('https://ai-schedular-backend.onrender.com/api/booked-dates');
+      const res = await axios.get(`${API_BASE}/api/booked-dates`);
       const map = (res?.data && typeof res.data === 'object') ? res.data : {};
       console.log('[FETCH]/api/booked-dates =>', map);
 
@@ -164,12 +164,12 @@ function AIFormTwo() {
       const recaptchaToken = await executeRecaptcha('submit_form');
 
       // Availability check: send MM/DD/YYYY (DB key)
-      const key1 = classDate  ? formatKey(classDate)  : null;
+      const key1 = classDate ? formatKey(classDate) : null;
       const key2 = classDate2 ? formatKey(classDate2) : null;
 
       const [a1, a2] = await Promise.all([
-        axios.post('https://ai-schedular-backend.onrender.com/api/check-availability', { classDate: key1, time }),
-        axios.post('https://ai-schedular-backend.onrender.com/api/check-availability', { classDate: key2, time: time2 }),
+        axios.post(`${API_BASE}/api/check-availability`, { classDate: key1, time }),
+        axios.post(`${API_BASE}/api/check-availability`, { classDate: key2, time: time2 }),
       ]);
 
       const errs = [];
@@ -185,15 +185,16 @@ function AIFormTwo() {
       const payload = {
         firstName, lastName, email, yourCompany, phoneNumber,
         time, time2,
-        classDate:  classDate  ? moment(classDate).format('YYYY-MM-DD')  : null,
+        classDate: classDate ? moment(classDate).format('YYYY-MM-DD') : null,
         classDate2: classDate2 ? moment(classDate2).format('YYYY-MM-DD') : null,
         recaptchaToken,
       };
 
-      await axios.post('https://ai-schedular-backend.onrender.com/api/intro-to-ai-payment', payload, {
+      await axios.post(`${API_BASE}/api/intro-to-ai-payment`, payload, {
         withCredentials: true,
         headers: { 'Content-Type': 'application/json' },
       });
+
 
       // Clear cache and refresh availability
       sessionStorage.removeItem('bookedDates');
@@ -232,32 +233,32 @@ function AIFormTwo() {
             <form className="row g-3" onSubmit={handleSubmit}>
               <div className="col-6">
                 <label className="form-label">First Name</label>
-                <input className="form-control" value={firstName} onChange={(e)=>setFirstName(e.target.value)} required />
+                <input className="form-control" value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
               </div>
               <div className="col-6">
                 <label className="form-label">Last Name</label>
-                <input className="form-control" value={lastName} onChange={(e)=>setLastName(e.target.value)} required />
+                <input className="form-control" value={lastName} onChange={(e) => setLastName(e.target.value)} required />
               </div>
               <div className="col-6">
                 <label className="form-label">Company Name</label>
-                <input className="form-control" value={yourCompany} onChange={(e)=>setYourCompany(e.target.value)} required />
+                <input className="form-control" value={yourCompany} onChange={(e) => setYourCompany(e.target.value)} required />
               </div>
               <div className="col-6">
                 <label className="form-label">Phone Number</label>
-                <input className="form-control" value={phoneNumber} onChange={(e)=>setPhoneNumber(e.target.value)} required />
+                <input className="form-control" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} required />
               </div>
               <div className="col-12">
                 <label className="form-label">Email</label>
-                <input type="email" className="form-control" value={email} onChange={(e)=>setEmail(e.target.value)} required />
+                <input type="email" className="form-control" value={email} onChange={(e) => setEmail(e.target.value)} required />
               </div>
 
               <div className="col-md-6">
                 <label className="form-label date-picker">Class Date 1</label>
                 <DatePicker
                   selected={classDate}
-                  onChange={(d)=>setClassDate(d)}
+                  onChange={(d) => setClassDate(d)}
                   dateFormat="MM/dd/yyyy"
-                  filterDate={(d)=>!isDateDisabled(d)}   // IMPORTANT: negate to disable
+                  filterDate={(d) => !isDateDisabled(d)}   // IMPORTANT: negate to disable
                   dayClassName={getDayClassName}
                   className="form-control"
                   placeholderText="Select a date"
@@ -266,9 +267,9 @@ function AIFormTwo() {
               </div>
               <div className="col-md-6">
                 <label className="form-label">Program Time 1</label>
-                <select className="form-select" value={time} onChange={(e)=>setTime(e.target.value)} required>
+                <select className="form-select" value={time} onChange={(e) => setTime(e.target.value)} required>
                   <option value="">Select a time</option>
-                  {getAvailableTimeSlots(classDate).map((s)=>(
+                  {getAvailableTimeSlots(classDate).map((s) => (
                     <option key={s} value={s} disabled={getDisabledTimes(classDate).includes(s)}>{s}</option>
                   ))}
                 </select>
@@ -278,9 +279,9 @@ function AIFormTwo() {
                 <label className="form-label date-picker">Class Date 2</label>
                 <DatePicker
                   selected={classDate2}
-                  onChange={(d)=>setClassDate2(d)}
+                  onChange={(d) => setClassDate2(d)}
                   dateFormat="MM/dd/yyyy"
-                  filterDate={(d)=>!isDateDisabled(d)}
+                  filterDate={(d) => !isDateDisabled(d)}
                   dayClassName={getDayClassName}
                   className="form-control"
                   placeholderText="Select a date"
@@ -289,9 +290,9 @@ function AIFormTwo() {
               </div>
               <div className="col-md-6">
                 <label className="form-label">Program Time 2</label>
-                <select className="form-select" value={time2} onChange={(e)=>setTime2(e.target.value)} required>
+                <select className="form-select" value={time2} onChange={(e) => setTime2(e.target.value)} required>
                   <option value="">Select a time</option>
-                  {getAvailableTimeSlots(classDate2).map((s)=>(
+                  {getAvailableTimeSlots(classDate2).map((s) => (
                     <option key={s} value={s} disabled={getDisabledTimes(classDate2).includes(s)}>{s}</option>
                   ))}
                 </select>
@@ -299,7 +300,7 @@ function AIFormTwo() {
 
               <div className="col-12">
                 <div className="form-check">
-                  <input className="form-check-input" type="checkbox" checked={termsChecked} onChange={(e)=>setTermsChecked(e.target.checked)} required />
+                  <input className="form-check-input" type="checkbox" checked={termsChecked} onChange={(e) => setTermsChecked(e.target.checked)} required />
                   <label className="form-check-label">
                     By providing your contact information and checking the box, you agree that Kable Academy may contact you...
                     <a href="https://kableacademy.com/private-policy/"> Privacy Policy.</a>
