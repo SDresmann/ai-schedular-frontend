@@ -87,11 +87,8 @@ function AIFormTwo() {
     if (!date) return false;
     const wd = moment(date).isoWeekday();
     if (wd >= 6) return true; // weekends
-
-    const required = wd === 5 ? 3 : 2; // Fri=3, others=2
     const rawCount = getRawBookedCount(date);
-
-    return rawCount >= required;
+    return rawCount > 0;
   };
 
   // Visual classes (purely cosmetic; do NOT block clicks)
@@ -99,11 +96,8 @@ function AIFormTwo() {
     if (!date) return '';
     const wd = moment(date).isoWeekday();
     if (wd >= 6) return '';
-
-    const required = wd === 5 ? 3 : 2;
     const rawCount = getRawBookedCount(date);
-    if (rawCount >= required) return 'fully-booked';
-    if (rawCount > 0) return 'partially-booked';
+    if (rawCount > 0) return 'fully-booked';
     return '';
   };
 

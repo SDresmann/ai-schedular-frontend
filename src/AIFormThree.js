@@ -88,15 +88,14 @@ function AIFormThree() {
 
     const key          = formatKey(date);
     const bookedCount  = (bookedDates?.[key] ?? []).length;
-    const requiredSlots = isFri(date) ? 3 : 2;
-    const fullyBooked  = bookedCount >= requiredSlots;
+    const fullyBooked  = bookedCount > 0;
     return fullyBooked;
   };
 
-  // Day class (for grey block) when any bookings exist (optional styling cue)
+  // Day class for any date that already has bookings
   const getDayClassName = (date) => {
     const key = formatKey(date);
-    if (bookedDates?.[key]?.length > 0) return 'booked-date';
+    if (bookedDates?.[key]?.length > 0) return 'fully-booked';
     return '';
   };
 

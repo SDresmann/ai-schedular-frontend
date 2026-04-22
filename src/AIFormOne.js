@@ -68,19 +68,16 @@ function AIFormOne() {
     if (!date) return false;
     const wd = moment(date).isoWeekday();
     if (wd >= 6) return true; // weekends
-    const required = wd === 5 ? 3 : 2;
     const raw = getRawBookedCount(date);
-    return raw >= required;
+    return raw > 0;
   };
 
   const getDayClassName = (date) => {
     if (!date) return '';
     const wd = moment(date).isoWeekday();
     if (wd >= 6) return '';
-    const required = wd === 5 ? 3 : 2;
     const raw = getRawBookedCount(date);
-    if (raw >= required) return 'fully-booked';
-    if (raw > 0) return 'partially-booked';
+    if (raw > 0) return 'fully-booked';
     return '';
   };
 
