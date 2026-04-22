@@ -117,7 +117,10 @@ function AIFormOne() {
     setErrorMessage('');
 
     if (!executeRecaptcha) {
-      setTimeout(() => handleSubmit(e), 500);
+      setErrorMessage(
+        'reCAPTCHA is not ready. Please refresh the page and try again.'
+      );
+      setIsLoading(false);
       return;
     }
 

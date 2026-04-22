@@ -91,9 +91,6 @@ function AIFormTwo() {
     const required = wd === 5 ? 3 : 2; // Fri=3, others=2
     const rawCount = getRawBookedCount(date);
 
-    // Debug each visible day when the calendar is opened
-    console.log('[FILTER]', formatKey(date), { rawCount, required, wd });
-
     return rawCount >= required;
   };
 
@@ -116,8 +113,6 @@ function AIFormTwo() {
   const updateValidDates = useCallback(async () => {
     try {
       const map = await getBookedDates(API_BASE);
-      console.log('[FETCH]/api/booked-dates =>', map);
-
       setBookedDates(map);
       sessionStorage.setItem('bookedDates', JSON.stringify(map));
 
@@ -131,12 +126,10 @@ function AIFormTwo() {
         const key = cursor.format('MM/DD/YYYY');
         const req = cursor.isoWeekday() === 5 ? 3 : 2;
         const cnt = (map[key] ?? []).length;
-        console.log('[VALIDATE]', key, { cnt, required: req, weekday: cursor.isoWeekday() });
         if (cnt < req) preview.push(key);
         cursor = cursor.clone().add(1, 'day');
         guard++;
       }
-      console.log('[PREVIEW next 7]', preview);
     } catch (err) {
       console.error('❌ Error fetching /api/booked-dates:', err);
       const cachedBooked = sessionStorage.getItem('bookedDates');
@@ -164,7 +157,10 @@ function AIFormTwo() {
     setErrorMessage('');
 
     if (!executeRecaptcha) {
-      setTimeout(() => handleSubmit(e), 500);
+      setErrorMessage(
+        'reCAPTCHA is not ready. Please refresh the page and try again.'
+      );
+      setIsLoading(false);
       return;
     }
 

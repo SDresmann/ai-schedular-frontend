@@ -178,8 +178,10 @@ function AIFormThree() {
 
     // Ensure recaptcha is ready
     if (!executeRecaptcha) {
-      console.warn('⚠️ reCAPTCHA not ready yet, retrying in 500ms...');
-      setTimeout(() => handleSubmit(e), 500);
+      setErrorMessage(
+        'reCAPTCHA is not ready. Please refresh the page and try again.'
+      );
+      setIsLoading(false);
       return;
     }
 
