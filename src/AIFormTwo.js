@@ -259,6 +259,11 @@ function AIFormTwo() {
                 <input type="email" className="form-control" value={email} onChange={(e) => setEmail(e.target.value)} required />
               </div>
 
+              <div className="col-12">
+                <small style={{ display: 'block', marginBottom: 6 }}>
+                  Dates that are crossed out are unavailable.
+                </small>
+              </div>
               <div className="col-md-6">
                 <label className="form-label date-picker">Class Date 1</label>
                 <DatePicker

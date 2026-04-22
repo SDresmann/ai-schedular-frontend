@@ -252,6 +252,11 @@ function AIFormOne() {
               </div>
 
               {/* Date and time picker */}
+              <div className="col-12">
+                <small style={{ display: 'block', marginBottom: 6 }}>
+                  Dates that are crossed out are unavailable.
+                </small>
+              </div>
               <div className="col-md-6">
                 <label className="form-label date-picker">Class Date</label>
                 <DatePicker

@@ -371,6 +371,11 @@ function AIFormThree() {
                 />
               </div>
 
+              <div className="col-12">
+                <small style={{ display: 'block', marginBottom: '6px' }}>
+                  Dates that are crossed out are unavailable.
+                </small>
+              </div>
               {/* Class Date 1 */}
               <div className="col-md-6">
                 <label htmlFor="inputDate" className="form-label date-picker">Class Date 1</label>
