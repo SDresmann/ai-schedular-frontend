@@ -27,13 +27,20 @@ a{
   pointer-events: none !important; /* visually and functionally disabled */
 }
 
-/* Visual hints only — do NOT block clicks */
-.partially-booked .react-datepicker__day {
+/* React DatePicker adds dayClassName directly on the day element */
+.react-datepicker__day.partially-booked {
   outline: 1px dashed #bbb;
 }
 
-.fully-booked .react-datepicker__day {
+.react-datepicker__day.fully-booked {
   outline: 2px solid #999;
+  text-decoration: line-through !important;
+}
+
+/* AIFormThree uses `booked-date` for any date with booked slots */
+.react-datepicker__day.booked-date {
+  outline: 1px dashed #bbb;
+  text-decoration: line-through !important;
 }
 
 
