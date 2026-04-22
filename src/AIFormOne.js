@@ -4,6 +4,11 @@ import moment from 'moment';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { GoogleReCaptchaProvider, useGoogleReCaptcha } from 'react-google-recaptcha-v3';
+import {
+  clearBookedDatesCache,
+  getBookedDates,
+  seedBookedDatesCache,
+} from './bookedDatesApi';
 
 const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
 
@@ -84,8 +89,7 @@ function AIFormOne() {
   // --------------------------------------------------
   const refreshBooked = useCallback(async () => {
     try {
-      const res = await axios.get(`${API_BASE}/api/booked-dates`);
-      const map = (res?.data && typeof res.data === 'object') ? res.data : {};
+      const map = await getBookedDates(API_BASE);
       setBookedDates(map);
       sessionStorage.setItem('bookedDates', JSON.stringify(map));
     } catch {
@@ -96,7 +100,11 @@ function AIFormOne() {
 
   useEffect(() => {
     const bd = sessionStorage.getItem('bookedDates');
-    if (bd) setBookedDates(JSON.parse(bd));
+    if (bd) {
+      const parsed = JSON.parse(bd);
+      setBookedDates(parsed);
+      seedBookedDatesCache(parsed);
+    }
     refreshBooked();
   }, [refreshBooked]);
 
@@ -148,13 +156,21 @@ function AIFormOne() {
         }
       );
 
-
       sessionStorage.removeItem('bookedDates');
-      refreshBooked();
+      clearBookedDatesCache();
+      const freshMap = await getBookedDates(API_BASE, { forceRefresh: true });
+      setBookedDates(freshMap);
+      sessionStorage.setItem('bookedDates', JSON.stringify(freshMap));
       setIsSubmitted(true);
       window.top.location.href = 'https://ka.kableacademy.com/techcred-registration-thank-you';
-    } catch {
-      setErrorMessage('❌ An error occurred. Please try again.');
+    } catch (err) {
+      if (err?.response?.status === 429) {
+        setErrorMessage(
+          'Too many requests right now. Please wait 1-2 minutes and try again.'
+        );
+      } else {
+        setErrorMessage('❌ An error occurred. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }

@@ -4,6 +4,11 @@ import moment from 'moment';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { GoogleReCaptchaProvider, useGoogleReCaptcha } from 'react-google-recaptcha-v3';
+import {
+  clearBookedDatesCache,
+  getBookedDates,
+  seedBookedDatesCache,
+} from './bookedDatesApi';
 
 const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
 
@@ -110,8 +115,7 @@ function AIFormTwo() {
   // --------------------------------------------------
   const updateValidDates = useCallback(async () => {
     try {
-      const res = await axios.get(`${API_BASE}/api/booked-dates`);
-      const map = (res?.data && typeof res.data === 'object') ? res.data : {};
+      const map = await getBookedDates(API_BASE);
       console.log('[FETCH]/api/booked-dates =>', map);
 
       setBookedDates(map);
@@ -143,7 +147,11 @@ function AIFormTwo() {
   useEffect(() => {
     // Load any cached map first for snappy UI, then refresh
     const bd = sessionStorage.getItem('bookedDates');
-    if (bd) setBookedDates(JSON.parse(bd));
+    if (bd) {
+      const parsed = JSON.parse(bd);
+      setBookedDates(parsed);
+      seedBookedDatesCache(parsed);
+    }
     updateValidDates();
   }, [updateValidDates]);
 
@@ -198,13 +206,22 @@ function AIFormTwo() {
 
       // Clear cache and refresh availability
       sessionStorage.removeItem('bookedDates');
-      updateValidDates();
+      clearBookedDatesCache();
+      const freshMap = await getBookedDates(API_BASE, { forceRefresh: true });
+      setBookedDates(freshMap);
+      sessionStorage.setItem('bookedDates', JSON.stringify(freshMap));
 
       setIsSubmitted(true);
       window.top.location.href = 'https://ka.kableacademy.com/techcred-registration-thank-you';
     } catch (err) {
       console.error(err);
-      setErrorMessage('❌ An error occurred. Please try again.');
+      if (err?.response?.status === 429) {
+        setErrorMessage(
+          'Too many requests right now. Please wait 1-2 minutes and try again.'
+        );
+      } else {
+        setErrorMessage('❌ An error occurred. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }

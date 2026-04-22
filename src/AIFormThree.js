@@ -4,6 +4,11 @@ import moment from 'moment';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { GoogleReCaptchaProvider, useGoogleReCaptcha } from 'react-google-recaptcha-v3';
+import {
+  clearBookedDatesCache,
+  getBookedDates,
+  seedBookedDatesCache,
+} from './bookedDatesApi';
 
 const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
 
@@ -112,8 +117,7 @@ function AIFormThree() {
   const updateValidDates = useCallback(async () => {
     try {
       // 🔑 use /api/booked-dates so bookedDates map is correct
-      const response  = await axios.get(`${API_BASE}/api/booked-dates`);
-      const bookedMap = response.data; // { "MM/DD/YYYY": ["slot1","slot2",...] }
+      const bookedMap = await getBookedDates(API_BASE); // { "MM/DD/YYYY": ["slot1","slot2",...] }
 
       const newValidDates = [];
       let cursor = moment().add(2, 'days');
@@ -153,7 +157,9 @@ function AIFormThree() {
     const cachedBookedDates = sessionStorage.getItem('bookedDates');
     if (cachedDates && cachedBookedDates) {
       setValidDates(JSON.parse(cachedDates));
-      setBookedDates(JSON.parse(cachedBookedDates));
+      const parsedBookedDates = JSON.parse(cachedBookedDates);
+      setBookedDates(parsedBookedDates);
+      seedBookedDatesCache(parsedBookedDates);
       setDatesLoading(false);
       console.log('✅ Loaded cached valid & booked dates');
     }
@@ -255,6 +261,10 @@ function AIFormThree() {
       // Clear cached dates & refresh
       sessionStorage.removeItem('validDates');
       sessionStorage.removeItem('bookedDates');
+      clearBookedDatesCache();
+      const freshMap = await getBookedDates(API_BASE, { forceRefresh: true });
+      setBookedDates(freshMap);
+      sessionStorage.setItem('bookedDates', JSON.stringify(freshMap));
       updateValidDates();
 
       // Redirect
@@ -262,7 +272,13 @@ function AIFormThree() {
       window.top.location.href = 'https://ka.kableacademy.com/techcred-registration-thank-you';
     } catch (error) {
       console.error('Error during form submission:', error);
-      setErrorMessage('❌ An error occurred. Please try again.');
+      if (error?.response?.status === 429) {
+        setErrorMessage(
+          'Too many requests right now. Please wait 1-2 minutes and try again.'
+        );
+      } else {
+        setErrorMessage('❌ An error occurred. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }
